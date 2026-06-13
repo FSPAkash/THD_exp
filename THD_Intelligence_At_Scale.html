@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelligence Applications at Scale — The Home Depot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-sans:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+  --font-mono:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+  --bg-app:#FFFFFF; --bg-chrome:#FAFAFA; --bg-paper:#FFFFFF; --bg-input:#FFFFFF;
+  --bg-hover:#F4F4F4; --bg-stripe:#FAFAFA;
+  --ink:#111111; --ink-2:#3F3F3F; --ink-3:#757575; --ink-4:#A8A8A8;
+  --line:#E5E5E5; --line-2:#EFEFEF; --line-strong:#D0D0D0;
+  /* accent = THD orange (overrides the spec's iron-red) */
+  --accent:#F96302; --accent-ink:#C24E02; --accent-soft:#FBD9C0; --accent-tint:#FFF3EA;
+  --ok:oklch(0.55 0.12 150); --ok-soft:oklch(0.94 0.05 150);
+  --warn:oklch(0.62 0.13 70); --warn-soft:oklch(0.95 0.06 75); --warn-ink:oklch(0.48 0.13 65);
+  --err:oklch(0.55 0.18 25);
+  --shadow-window:0 1px 0 rgba(0,0,0,.03),0 12px 32px -8px rgba(60,40,20,.18),0 2px 6px rgba(60,40,20,.08);
+  --r-card:6px; --r-input:4px; --r-win:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);font-size:14px;line-height:1.45;letter-spacing:-.005em;
+  background:var(--bg-app);color:var(--ink);overflow:hidden;
+  font-feature-settings:"tnum" 1,"ss01" 1;-webkit-font-smoothing:antialiased}
+.mono{font-variant-numeric:tabular-nums}
+
+/* chrome */
+.brandbar{position:fixed;top:0;left:0;right:0;height:38px;background:var(--bg-chrome);
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;padding:0 18px;z-index:40}
+.brandbar img{height:18px;width:18px;object-fit:contain}
+.brandbar .t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.brandbar .t em{font-style:normal;color:var(--ink-3);font-weight:600}
+.brandstrip{position:fixed;top:38px;left:0;right:0;height:3px;z-index:41;
+  background:linear-gradient(to right,#F96302 0,#F96302 84%,#F5A623 84%,#F5A623 100%)}
+.statusbar{position:fixed;bottom:0;left:0;right:0;height:34px;background:var(--bg-chrome);
+  border-top:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 18px;z-index:40;
+  font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink-3)}
+.statusbar .ldot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+.statusbar .sep{width:1px;height:14px;background:var(--line)}
+.statusbar .right{margin-left:auto;display:flex;align-items:center;gap:14px}
+
+#deck{position:absolute;top:41px;bottom:34px;left:0;right:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column}
+.slide.active{display:flex}
+.pad{flex:1;display:flex;flex-direction:column;padding:30px 54px 22px;min-height:0;overflow:hidden}
+
+/* entrance — restrained per spec §8 */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide.active .en{opacity:0;animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both}
+.slide.active .en.d1{animation-delay:.05s}.slide.active .en.d2{animation-delay:.10s}
+.slide.active .en.d3{animation-delay:.16s}.slide.active .en.d4{animation-delay:.22s}
+.slide.active .stag>*{opacity:0;animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both}
+.slide.active .stag>*:nth-child(1){animation-delay:.08s}.slide.active .stag>*:nth-child(2){animation-delay:.14s}
+.slide.active .stag>*:nth-child(3){animation-delay:.20s}.slide.active .stag>*:nth-child(4){animation-delay:.26s}
+.slide.active .stag>*:nth-child(5){animation-delay:.32s}.slide.active .stag>*:nth-child(6){animation-delay:.38s}
+
+.eyebrow{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px}
+.eyebrow .bar{width:22px;height:2px;background:var(--accent)}
+h1{font-size:clamp(28px,3.6vw,42px);font-weight:700;letter-spacing:-.02em;line-height:1.06;color:var(--ink)}
+h1 em{font-style:normal;color:var(--accent-ink)}
+h2{font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:var(--ink);margin-bottom:3px}
+.lede{font-size:13px;color:var(--ink-2);max-width:96ch;margin-top:4px;line-height:1.5}
+.lede b{color:var(--ink);font-weight:600}
+.microlabel{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
+.spacer{flex:1}
+
+/* card (spec §5) */
+.card{background:var(--bg-paper);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;display:flex;flex-direction:column}
+.card-head{min-height:32px;padding:7px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line-2);
+  background:var(--bg-stripe);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+.card-head .dot-r{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.card-head .tail{margin-left:auto;font-weight:600;color:var(--ink-3);letter-spacing:0;text-transform:none;font-size:11px;font-variant-numeric:tabular-nums}
+.card-body{padding:14px;flex:1}
+
+/* stat tile (spec §5) */
+.stat{border:1px solid var(--line);background:var(--bg-paper);border-radius:var(--r-card);padding:12px 14px}
+.stat .label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.stat .value{font-variant-numeric:tabular-nums;font-size:30px;font-weight:700;color:var(--ink);margin-top:4px;line-height:1}
+.stat .value .u{font-size:15px;color:var(--ink-3);font-weight:600}
+.stat .value.o{color:var(--accent-ink)} .stat .value.ok{color:var(--ok)}
+.stat .ctx{font-size:11px;color:var(--ink-3);margin-top:8px;line-height:1.4}
+.stat .ctx b{color:var(--ink-2);font-weight:600}
+
+.grid{display:grid;gap:11px}
+.row{display:flex;gap:10px;align-items:center}
+
+/* chip (spec §5) */
+.chip{display:inline-flex;align-items:center;gap:6px;height:21px;padding:0 9px;border-radius:11px;
+  font-size:10px;font-variant-numeric:tabular-nums;font-weight:600;background:var(--bg-hover);color:var(--ink-2);
+  border:1px solid var(--line-2);text-transform:uppercase;letter-spacing:.05em}
+.chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.accent{background:var(--accent-tint);color:var(--accent-ink);border-color:transparent}
+.cdot{width:7px;height:7px;border-radius:50%;flex:none}
+.cdot.b{background:var(--ink-3)} .cdot.p{background:var(--ok)} .cdot.f{background:var(--accent)}
+
+/* phase columns — hairline cards, no rails, no shadow */
+.phase{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;flex:1;min-height:0;margin-top:10px}
+.phasecol{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;min-height:0}
+.phasecol.future{border-color:var(--accent-soft)}
+.phasehd{padding:8px 12px;border-bottom:1px solid var(--line-2);background:var(--bg-stripe);display:flex;align-items:center;gap:9px}
+.phasecol.future .phasehd{background:var(--accent-tint)}
+.phasehd .ph{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+.phasehd .sub{margin-left:auto;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.phasebody{padding:11px;flex:1;display:flex;flex-direction:column;gap:9px}
+.engine{border:1px solid var(--line-2);border-radius:var(--r-input);padding:9px 11px;transition:background 120ms}
+.engine:hover{background:var(--bg-hover)}
+.engine .et{font-size:12.5px;font-weight:700;letter-spacing:-.01em;color:var(--ink);display:flex;align-items:center;gap:7px}
+.engine .ed{font-size:11px;color:var(--ink-3);margin-top:3px;line-height:1.4}
+.engine .ed .m{color:var(--accent-ink);font-weight:700}
+
+/* adopters — hairline cards */
+.adopt{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.adoptcard .team{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.adoptcard .uses{font-size:12px;color:var(--ink-3);margin-top:7px;line-height:1.5}
+.adoptcard .uses b{color:var(--ink-2)}
+
+.callout{padding:12px 15px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--bg-stripe)}
+.callout p{font-size:13px;font-weight:500;color:var(--ink)}
+.callout .o{color:var(--accent-ink);font-weight:700}
+
+/* lab interactive */
+.lab{display:grid;grid-template-columns:312px 1fr;gap:14px;flex:1;min-height:0;margin-top:10px}
+.panel{border:1px solid var(--line);border-radius:var(--r-card);background:var(--bg-paper);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.panel-head{min-height:32px;padding:7px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line-2);
+  background:var(--bg-stripe);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+.panel-head .dot-r{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.panel-head .tail{margin-left:auto;font-weight:600;color:var(--ink-3);letter-spacing:0;text-transform:none;font-size:11px;font-variant-numeric:tabular-nums}
+.cbody{padding:12px;overflow-y:auto;flex:1;min-height:0}
+.cv-inner{padding:12px;display:flex;flex-direction:column;flex:1;min-height:0}
+.cv-inner canvas{width:100%;flex:1;min-height:0}
+.field{margin-bottom:12px}
+.field-label{display:flex;justify-content:space-between;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-bottom:6px}
+.field-label .val{font-variant-numeric:tabular-nums;color:var(--accent-ink);text-transform:none;letter-spacing:0;font-size:12px;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--accent);height:4px;cursor:pointer}
+.btn{width:100%;margin-top:6px;height:34px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-input);font-weight:700;font-size:12.5px;cursor:pointer;font-family:var(--font-sans);transition:background 120ms,transform 80ms}
+.btn:hover{background:var(--accent-ink)} .btn:active{transform:translateY(1px)} .btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:#fff;color:var(--accent-ink);border:1px solid var(--line)} .btn.ghost:hover{background:var(--bg-hover)}
+.seg{display:flex;flex-direction:column;gap:6px}
+.seg button{border:1px solid var(--line);background:#fff;border-radius:var(--r-input);padding:7px 10px;font-size:11.5px;font-weight:600;color:var(--ink-3);cursor:pointer;font-family:var(--font-sans);text-align:left;transition:background 120ms}
+.seg button:hover{background:var(--bg-hover)} .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.signal{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line-2);font-size:11px;cursor:pointer}
+.signal:first-child{border-top:none} .signal.off{opacity:.4}
+.signal .si{width:22px;height:22px;border-radius:var(--r-input);background:var(--accent-tint);color:var(--accent-ink);display:grid;place-items:center;font-size:12px;flex:none;margin-top:1px}
+.signal.off .si{background:var(--bg-hover);color:var(--ink-4)}
+.signal .stxt{color:var(--ink-2);line-height:1.32} .signal .stxt b{color:var(--ink);display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em}
+.signal .sdelta{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700;font-size:11px;flex:none;margin-top:1px}
+.sdelta.up{color:var(--ok)} .sdelta.down{color:var(--err)}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:9px 0;font-size:11.5px;font-weight:600;color:var(--ink-2);border-top:1px solid var(--line-2)}
+.sw{position:relative;width:36px;height:20px;border-radius:99px;background:var(--line-strong);cursor:pointer;transition:.18s;flex:none}
+.sw.on{background:var(--ok)} .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.18s}
+.sw.on::after{transform:translateX(16px)}
+.readout{display:flex;margin-top:11px;border-top:1px solid var(--line-2);padding-top:11px}
+.ro{flex:1;padding:0 13px;border-right:1px solid var(--line-2)} .ro:first-child{padding-left:0} .ro:last-child{border-right:none}
+.ro .v{font-variant-numeric:tabular-nums;font-size:20px;font-weight:700;color:var(--ink);line-height:1}
+.ro .v.up{color:var(--ok)} .ro .v.down{color:var(--err)} .ro .v.acc{color:var(--accent-ink)}
+.ro .k{font-size:9.5px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:5px}
+.hint{font-size:10.5px;color:var(--accent-ink);font-weight:600;margin-top:5px;display:flex;align-items:center;gap:.5em;text-transform:uppercase;letter-spacing:.05em}
+.hint::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.35}}
+.flowchain{display:flex;flex-direction:column;gap:6px;flex:1;min-height:0}
+.step{border:1px solid var(--line-2);border-radius:var(--r-card);padding:8px 12px;display:flex;gap:10px;align-items:flex-start;opacity:.4;transition:.3s;background:#fff;flex:1;min-height:0}
+.step.on{opacity:1;background:var(--accent-tint)}
+.step.gate.on{background:var(--warn-soft)}
+.step .ic{width:24px;height:24px;border-radius:var(--r-input);display:grid;place-items:center;font-size:11px;flex:none;border:1px solid var(--line-2);margin-top:1px;font-variant-numeric:tabular-nums;color:var(--ink-3);background:var(--bg-hover);font-weight:700}
+.step.on .ic{background:var(--accent);border-color:var(--accent);color:#fff}
+.step.gate.on .ic{background:var(--warn);border-color:var(--warn)}
+.step .t{font-size:11px;color:var(--ink-2);line-height:1.3}
+.step .t b{color:var(--ink);font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:1px}
+.step .t small{color:var(--ink-3);font-size:11px}
+.step .badge{margin-left:auto;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:3px;flex:none;margin-top:1px}
+.step.on .badge.auto{background:var(--ok-soft);color:var(--ok)} .step.on .badge.gate{background:#fff;color:var(--warn-ink);border:1px solid var(--warn)}
+.feed{border:1px solid var(--line-2);border-radius:var(--r-card);background:var(--bg-stripe);padding:8px 12px;margin-bottom:9px;font-variant-numeric:tabular-nums;font-size:11px;color:var(--ink-3);display:flex;align-items:center;gap:8px;flex:none}
+.feed .pulse{width:8px;height:8px;border-radius:50%;background:var(--err);animation:blink 1s infinite;flex:none}
+.feed b{color:var(--ink);font-weight:700}
+
+#nav{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:50;
+  background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 10px;box-shadow:var(--shadow-window)}
+#nav button{border:1px solid var(--line);background:#fff;color:var(--ink-2);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:grid;place-items:center;transition:.12s}
+#nav button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+#nav button:disabled{opacity:.35;cursor:default;background:#fff;color:var(--ink-3);border-color:var(--line)}
+#dots{display:flex;align-items:center;gap:7px;padding:0 2px}
+#dots .d{width:8px;height:8px;border-radius:50%;background:var(--line-strong);cursor:pointer;transition:width .18s,background .18s}
+#dots .d:hover{background:var(--ink-4)}
+#dots .d.on{background:var(--accent);width:22px;border-radius:99px}
+#counter{font-variant-numeric:tabular-nums;font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:.04em;padding-left:4px;border-left:1px solid var(--line-2);padding-left:10px}
+.pillbtn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:.1em .5em;border-radius:3px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.slide.active .en,.slide.active .stag>*{opacity:1}}
+</style>
+</head>
+<body>
+<div class="brandbar"><img src="THD.png" alt="The Home Depot"><span class="t">The Home Depot <em>· Advanced Analytics</em></span></div>
+<div class="brandstrip"></div>
+<div id="deck"></div>
+<div class="statusbar mono">
+  <span class="ldot"></span><span>AI FACTORY · RUNNING</span>
+  <span class="sep"></span><span>4 YRS ON THD DATA</span>
+  <span class="sep"></span><span>EXPANSION PROPOSAL</span>
+  <span class="right"><span id="sb-pos">01 / 07</span></span>
+</div>
+<div id="nav">
+  <button id="prev" aria-label="Previous">‹</button>
+  <button id="next" aria-label="Next">›</button>
+  <div id="dots"></div>
+  <span id="counter" class="mono">1 / 7</span>
+</div>
+
+<script>
+const slides=[];
+
+/* 1 — TITLE */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="spacer"></div>
+  <div class="eyebrow en"><span class="bar"></span>The Home Depot · Advanced Analytics</div>
+  <h1 class="en d1">Intelligence Applications<br><em>at Scale for THD</em></h1>
+  <p class="lede en d2" style="font-size:14px;margin-top:14px;max-width:78ch">An AI Factory built on Home Depot's own data — engines that <b>build</b> on proven work, <b>evolve</b> into the Analytics Hub, and <b>expand</b> into what's next. A team that has delivered, ready to do more with more of the same caliber.</p>
+  <div class="grid en d4" style="grid-template-columns:repeat(3,1fr);margin-top:28px;max-width:760px">
+    <div class="stat"><div class="label">Proven engines</div><div class="value o mono">14<span class="u">+</span></div><div class="ctx">Shipped across predictive, automation &amp; generative</div></div>
+    <div class="stat"><div class="label">On THD data</div><div class="value mono">4<span class="u"> yrs</span></div><div class="ctx">In production · counterfactual rigor</div></div>
+    <div class="stat"><div class="label">Factory status</div><div class="value ok">Running</div><div class="ctx">Proven &amp; evolving · the next engines await capacity</div></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="row en"><span class="microlabel">Past · Present · Future</span><span class="microlabel" style="margin-left:auto">Confidential — prepared for THD leadership</span></div>
+</div></div>`);
+
+/* 2 — PROOF */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>Proof — what this team has shipped</div>
+  <h2 class="en d1">The engines work, at Home Depot scale</h2>
+  <p class="lede en d2">Four years of measurable wins on THD's own data — the credibility behind everything we propose next.</p>
+  <div class="grid stag" style="grid-template-columns:repeat(3,1fr);margin-top:20px">
+    <div class="stat"><div class="label">PLI · model accuracy</div><div class="value o mono"><span data-count="96">0</span><span class="u">%</span></div><div class="ctx"><b>100% traffic</b> coverage · 15 reports / 3-wk cycle</div></div>
+    <div class="stat"><div class="label">Bundle incrementality</div><div class="value mono">1 → <span data-count="7299">0</span></div><div class="ctx">From one model at a time to <b>7,299 bundles in a single run</b></div></div>
+    <div class="stat"><div class="label">Issue resolution · ADS</div><div class="value ok mono"><span data-count="96">0</span><span class="u">%</span> faster</div><div class="ctx"><b>50h → 2h</b>/wk · adopted cross-team</div></div>
+    <div class="stat"><div class="label">AB analysis · AIR</div><div class="value mono"><span data-count="90">0</span><span class="u">%</span> faster</div><div class="ctx">JIRA/Workfront · <b>AIR in BigQuery</b> · governed</div></div>
+    <div class="stat"><div class="label">Forecast · Tier-1 exo</div><div class="value o mono"><span data-count="95.8" data-dec="1">0</span><span class="u">%</span></div><div class="ctx"><b>MAPE 2.29 / 4.23</b> · most reliable exo variable</div></div>
+    <div class="stat"><div class="label">Gen-AI coverage</div><div class="value mono"><span data-count="6">0</span><span class="u">TB+</span></div><div class="ctx">Multi-agent NL → SQL/Python · <b>22 OKRs · 50+ BOF</b></div></div>
+  </div>
+</div></div>`);
+
+/* 3 — FACTORY: BUILD -> EVOLVE -> EXPAND */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The AI Factory — one system, three phases</div>
+  <h2 class="en d1">Build → Evolve → Expand</h2>
+  <p class="lede en d2">Not isolated projects. Each engine <b>builds</b> on a proven one, <b>evolves</b> into the Analytics Hub, and <b>expands</b> into the future — same data, compounding. The factory runs today and keeps growing.</p>
+  <div class="phase stag">
+    <div class="phasecol">
+      <div class="phasehd"><span class="ph">Build · Past</span><span class="sub">Proven, in production</span></div>
+      <div class="phasebody">
+        <div class="engine"><div class="et"><span class="cdot b"></span>Post-Launch Incrementality</div><div class="ed">Counterfactual baseline · <span class="m">96% accuracy</span></div></div>
+        <div class="engine"><div class="et"><span class="cdot b"></span>Bundle Incrementality</div><div class="ed">PLI parallelized · <span class="m">1 → 7,299 in one run</span></div></div>
+        <div class="engine"><div class="et"><span class="cdot b"></span>Anomaly Detection (ADS)</div><div class="ed">Real-time KPI · <span class="m">96% faster</span></div></div>
+        <div class="engine"><div class="et"><span class="cdot b"></span>AB-Test AIR · Forecasting</div><div class="ed">90% faster · 95.8% accuracy</div></div>
+      </div>
+    </div>
+    <div class="phasecol">
+      <div class="phasehd"><span class="ph">Evolve · Present</span><span class="sub">Building now</span></div>
+      <div class="phasebody">
+        <div class="engine"><div class="et"><span class="cdot p"></span>Prediction Hub</div><div class="ed">PLI → self-serve, multi-KPI parallel runs</div></div>
+        <div class="engine"><div class="et"><span class="cdot p"></span>Reporting Hub</div><div class="ed">Auto reports → analyst self-service</div></div>
+        <div class="engine"><div class="et"><span class="cdot p"></span>OKR / BOF Suite</div><div class="ed">22 OKRs · 50+ KPIs · automated pipeline</div></div>
+        <div class="engine"><div class="et"><span class="cdot p"></span>Gen-AI Wrapper</div><div class="ed">6TB+ conversational · NL → code</div></div>
+      </div>
+    </div>
+    <div class="phasecol future">
+      <div class="phasehd"><span class="ph">Expand · Future</span><span class="sub">Ready to build</span></div>
+      <div class="phasebody">
+        <div class="engine"><div class="et"><span class="cdot f"></span>Scenario Simulation</div><div class="ed">Evolves from counterfactual forecasting</div></div>
+        <div class="engine"><div class="et"><span class="cdot f"></span>Agentic Action Layer</div><div class="ed">Evolves from ADS detection</div></div>
+        <div class="engine"><div class="et"><span class="cdot f"></span>Feature-Impact Scoring</div><div class="ed">Pre-launch ROI · incrementality + intent</div></div>
+        <div class="engine"><div class="et"><span class="cdot f"></span>Gen-AI Copilots in Hub</div><div class="ed">NL KPI querying · narrative insights</div></div>
+      </div>
+    </div>
+  </div>
+</div></div>`);
+
+/* 4 — ALREADY ADOPTED */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The work already spreads across THD</div>
+  <h2 class="en d1">Demand isn't hypothetical — it's already here</h2>
+  <p class="lede en d2">Engines this team built are already adopted by other THD analytics teams, each running them on their own KPIs. Expansion means serving demand that already exists.</p>
+  <div class="adopt stag">
+    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>Store &amp; Decision Analytics</div><div class="card-body"><div class="uses">Runs <b>ADS anomaly detection</b> on store-side KPIs with domain-specific detection parameters.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
+    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>Product · BOF · Downloads</div><div class="card-body"><div class="uses">Anomaly detection on <b>product, BOF and downloads KPIs</b> — proactive monitoring, automated alerts.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
+    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>TOFU Marketing</div><div class="card-body"><div class="uses">Detection across <b>top-of-funnel campaigns</b> — the first cross-team rollout of the monitoring engine.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
+  </div>
+  <div class="callout en" style="margin-top:18px"><p>One engine, three teams. <span class="o">The factory's value compounds the moment more hands can extend it across THD.</span></p></div>
+</div></div>`);
+
+/* 5 — SCENARIO SIM */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>Expand · Future engine</div>
+  <h2 class="en d1">Scenario Simulation</h2>
+  <p class="lede en d2">Evolves from our 95%+ counterfactual forecasting. Forecasts capture effects seen in training — but the world moves after: a competitor doorbuster pulls demand away, a cold snap lifts it. The agent watches live signals and simulates a <b>risk band</b> around the baseline. Here: Large Appliances, into Black Friday.</p>
+  <div class="hint en d2">Toggle the live signals the agent detected — watch the risk band open around our trained baseline</div>
+  <div class="lab en d3">
+    <div class="panel">
+      <div class="panel-head"><span class="dot-r"></span>Agent — live signals (post-training)</div>
+      <div class="cbody">
+        <div id="ss_signals"></div>
+        <div class="field" style="margin-top:14px"><div class="field-label">Signal sensitivity<span class="val" id="ss_sens_v">1.0×</span></div><input type="range" id="ss_sens" min="5" max="20" value="10"></div>
+        <button id="ss_apply" class="btn ghost">Flag risk band to stakeholders</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">Large Appliances · online orders/day · Nov → Cyber Monday<span class="tail" id="ss_mode">baseline + signals</span></div>
+      <div class="cv-inner">
+        <canvas id="ss_canvas"></canvas>
+        <div class="readout">
+          <div class="ro"><span class="v up" id="ss_pos">—</span><span class="k">Positive impact vs. baseline</span></div>
+          <div class="ro"><span class="v down" id="ss_neg">—</span><span class="k">Negative impact vs. baseline</span></div>
+          <div class="ro"><span class="v acc" id="ss_risk">—</span><span class="k">Forecast at risk (±)</span></div>
+          <div class="ro"><span class="v" id="ss_kpi">—</span><span class="k">Online KPI signal</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>`);
+
+/* 6 — AGENTIC */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>Expand · Future engine</div>
+  <h2 class="en d1">Agentic Action Layer</h2>
+  <p class="lede en d2">Evolves from ADS detection. Scope today is online analytics: ADS detects, the agent diagnoses, predicts the trajectory, and gives online-KPI stakeholders a one-step-ahead heads-up — human-gated. With new data connections the same loop extends into action.</p>
+  <div class="hint en d2">Pick a THD event, then Run — the final step is a predictive heads-up to stakeholders</div>
+  <div class="lab en d3">
+    <div class="panel">
+      <div class="panel-head"><span class="dot-r"></span>Simulate a THD event</div>
+      <div class="cbody">
+        <div class="field"><div class="field-label">Scenario</div><div class="seg" id="ag_scen">
+          <button data-v="0" class="on">Large Appliances orders −18%</button>
+          <button data-v="1">Search CVR anomaly</button>
+          <button data-v="2">Bundle margin slips</button></div></div>
+        <div class="toggle">Auto-execute safe actions<span class="sw on" id="ag_auto"></span></div>
+        <button id="ag_run" class="btn">▶ Run agent</button>
+        <div style="margin-top:13px;border-top:1px solid var(--line-2);padding-top:11px">
+          <div class="microlabel" style="color:var(--accent-ink);margin-bottom:6px">With more data connections →</div>
+          <p style="font-size:11px;color:var(--ink-3);line-height:1.45">Wire in inventory, logistics &amp; fulfillment and the loop extends from <b style="color:var(--ink-2)">notify</b> to <b style="color:var(--ink-2)">act</b>. Future scope, gated on access.</p>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">Agent reasoning chain · online analytics<span class="tail" id="ag_status">idle</span></div>
+      <div class="cv-inner" style="justify-content:flex-start">
+        <div class="feed" id="ag_feed"><span class="pulse"></span><span>ADS stream — <b>monitoring 50+ KPIs</b> · awaiting trigger</span></div>
+        <div class="flowchain" id="ag_chain"></div>
+      </div>
+    </div>
+  </div>
+</div></div>`);
+
+/* 7 — THE ASK */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The ask — grow the Advanced Analytics team</div>
+  <h2 class="en d1">A proven team, ready to build more</h2>
+  <p class="lede en d2" style="max-width:84ch">This team has shipped the factory and is evolving it now — counterfactual rigor, production discipline, measurable impact. The engines are de-risked, the demand is proven, the roadmap is set. What turns the next engines into shipped reality is simply <b>more capacity of the same caliber</b> — and agents make every builder go further.</p>
+  <div class="grid stag" style="grid-template-columns:repeat(3,1fr);margin-top:22px">
+    <div class="stat"><div class="label">Build · Past</div><div class="value ok">Proven</div><div class="ctx">Engines in production — the foundation we extend</div></div>
+    <div class="stat"><div class="label">Evolve · Present</div><div class="value o">In flight</div><div class="ctx">Hub, copilots, self-serve — building now</div></div>
+    <div class="stat"><div class="label">Expand · Future</div><div class="value o">Ready</div><div class="ctx">Simulation, agentic, new engines — awaiting capacity</div></div>
+  </div>
+  <div class="callout en" style="margin-top:20px"><p>The team is strong; the limit is hours in the day. <span class="o">More builders of the same caliber means more of the factory shipped, faster — compounded by agents.</span></p></div>
+  <div class="spacer"></div>
+</div></div>`);
+
+/* ===== ENGINE ===== */
+const deck=document.getElementById('deck');
+deck.innerHTML=slides.join('');
+const S=[...document.querySelectorAll('.slide')];
+let cur=0;
+const dots=document.getElementById('dots');
+S.forEach((_,i)=>{const d=document.createElement('div');d.className='d';d.onclick=()=>go(i);dots.appendChild(d)});
+const dEls=[...dots.children];
+const pad2=n=>String(n).padStart(2,'0');
+const REDUCE=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const easeOut=t=>1-Math.pow(1-t,3);
+
+function go(i){
+  cur=Math.max(0,Math.min(S.length-1,i));
+  S.forEach((s,k)=>s.classList.toggle('active',k===cur));
+  dEls.forEach((d,k)=>d.classList.toggle('on',k===cur));
+  document.getElementById('counter').textContent=(cur+1)+' / '+S.length;
+  document.getElementById('sb-pos').textContent=pad2(cur+1)+' / '+pad2(S.length);
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===S.length-1;
+  startCounts(S[cur]);
+  if(initFns[cur])requestAnimationFrame(()=>requestAnimationFrame(initFns[cur]));
+}
+function startCounts(root){
+  root.querySelectorAll('[data-count]').forEach(el=>{
+    const target=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0);
+    const fmt=v=>{const n=v.toFixed(dec);return (+n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});};
+    if(REDUCE){el.textContent=fmt(target);return;}
+    const dur=900,t0=performance.now()+200;
+    function step(now){if(now<t0){requestAnimationFrame(step);return;}const p=Math.min(1,(now-t0)/dur);el.textContent=fmt(target*easeOut(p));if(p<1)requestAnimationFrame(step);else el.textContent=fmt(target);}
+    el.textContent='0';requestAnimationFrame(step);
+  });
+}
+document.getElementById('next').onclick=()=>go(cur+1);
+document.getElementById('prev').onclick=()=>go(cur-1);
+window.addEventListener('keydown',e=>{const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown')go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);});
+
+function fit(c){const r=c.getBoundingClientRect();const dpr=devicePixelRatio||1;
+  c.width=r.width*dpr;c.height=r.height*dpr;const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return [x,r.width,r.height];}
+const C_ACC='#F96302',C_ACC2='#C24E02',C_LINE='#EFEFEF',C_INK3='#757575',C_OK='#2e9e4f',C_ERR='#c0392b';
+const fmtN=n=>n>=1e3?(n/1e3).toFixed(1)+'k':Math.round(n);
+
+/* SIM */
+function scenarioSim(){
+  const c=document.getElementById('ss_canvas');
+  const N=40,TG=21,BF=23,CM=26;
+  const signals=[
+    {ic:'▤',t:'Competitor doorbuster on fridges (BF wk)',d:'−9.5%',dir:'down',on:true,center:BF,spread:3,amp:-0.42},
+    {ic:'❄',t:'Cold snap — heating appliances demand',d:'+6.1%',dir:'up',on:true,center:18,spread:6,amp:0.24},
+    {ic:'⤴',t:'Competitor viral deal on washers (social)',d:'−4.7%',dir:'down',on:false,center:24,spread:2,amp:-0.30},
+    {ic:'▦',t:'Competitor stock-out — spillover to THD',d:'+3.3%',dir:'up',on:false,center:25,spread:4,amp:0.18}
+  ];
+  const sigEl=document.getElementById('ss_signals');
+  function renderSignals(){
+    sigEl.innerHTML=signals.map((s,i)=>`<div class="signal ${s.on?'':'off'}"><div class="si">${s.ic}</div><div class="stxt"><b>${s.on?'detected · active':'detected · muted'}</b>${s.t}</div><span class="sdelta ${s.dir}">${s.d}</span></div>`).join('');
+    [...sigEl.querySelectorAll('.signal')].forEach((el,i)=>el.onclick=()=>{signals[i].on=!signals[i].on;renderSignals();draw();});
+  }
+  function draw(){
+    const sens=+document.getElementById('ss_sens').value/10;
+    document.getElementById('ss_sens_v').textContent=sens.toFixed(1)+'×';
+    const r=fit(c);const x=r[0],W=r[1],H=r[2];x.clearRect(0,0,W,H);x.textBaseline='alphabetic';
+    const padL=10,padR=10,padT=14,padB=28,pw=W-padL-padR,ph=H-padT-padB;
+    const base=[];for(let i=0;i<N;i++){let v=380;v+=260*Math.exp(-Math.pow(i-BF,2)/14);v+=90*Math.exp(-Math.pow(i-TG,2)/6);v+=120*Math.exp(-Math.pow(i-CM,2)/8);v+=i*4;base.push(v);}
+    const up=base.map((v,i)=>{let a=0;signals.forEach(s=>{if(s.on&&s.amp>0)a+=v*s.amp*sens*Math.exp(-Math.pow(i-s.center,2)/(2*s.spread*s.spread));});return v+a;});
+    const dn=base.map((v,i)=>{let a=0;signals.forEach(s=>{if(s.on&&s.amp<0)a+=v*s.amp*sens*Math.exp(-Math.pow(i-s.center,2)/(2*s.spread*s.spread));});return v+a;});
+    const max=Math.max(...up)*1.12;
+    const X=i=>padL+pw*i/(N-1),Y=v=>padT+ph*(1-v/max);
+    x.strokeStyle=C_LINE;x.lineWidth=1;for(let g=0;g<=4;g++){const yy=padT+ph*g/4;x.beginPath();x.moveTo(padL,yy);x.lineTo(W-padR,yy);x.stroke();}
+    [[TG,'Thanksgiving'],[BF,'Black Friday'],[CM,'Cyber Mon']].forEach(([d,lbl])=>{
+      x.strokeStyle='rgba(249,99,2,0.18)';x.setLineDash([3,4]);x.beginPath();x.moveTo(X(d),padT);x.lineTo(X(d),padT+ph);x.stroke();x.setLineDash([]);
+      x.fillStyle=C_INK3;x.font='600 9px Manrope,sans-serif';x.textAlign='center';x.fillText(lbl.toUpperCase(),X(d),padT+9);});
+    x.beginPath();up.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));for(let i=N-1;i>=0;i--)x.lineTo(X(i),Y(dn[i]));x.closePath();x.fillStyle='rgba(249,99,2,0.10)';x.fill();
+    x.strokeStyle='rgba(249,99,2,0.55)';x.lineWidth=1.4;
+    x.beginPath();up.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.stroke();
+    x.beginPath();dn.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.stroke();
+    x.strokeStyle='#9b9b9f';x.lineWidth=2;x.setLineDash([5,4]);x.beginPath();base.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.stroke();x.setLineDash([]);
+    x.font='600 10px Manrope,sans-serif';x.textAlign='left';
+    x.strokeStyle='#9b9b9f';x.setLineDash([4,3]);x.beginPath();x.moveTo(padL,H-6);x.lineTo(padL+16,H-6);x.stroke();x.setLineDash([]);
+    x.fillStyle=C_INK3;x.fillText('trained baseline',padL+20,H-3);
+    x.fillStyle='rgba(249,99,2,0.3)';x.fillRect(padL+128,H-11,14,9);
+    x.fillStyle=C_ACC2;x.fillText('agent risk band (live intel)',padL+147,H-3);
+    const upA=up.reduce((a,b)=>a+b,0),dnA=dn.reduce((a,b)=>a+b,0),bA=base.reduce((a,b)=>a+b,0);
+    const upP=(upA/bA-1)*100,dnP=(dnA/bA-1)*100;
+    document.getElementById('ss_pos').textContent='+'+upP.toFixed(1)+'%';
+    document.getElementById('ss_neg').textContent=dnP.toFixed(1)+'%';
+    document.getElementById('ss_risk').textContent='±'+((upP-dnP)/2).toFixed(1)+'%';
+    const anyOn=signals.some(s=>s.on),hasDown=signals.some(s=>s.on&&s.amp<0);
+    const ke=document.getElementById('ss_kpi');ke.textContent=!anyOn?'Nominal':hasDown?'At risk':'Upside';ke.className='v '+(hasDown?'down':anyOn?'up':'');
+  }
+  renderSignals();
+  document.getElementById('ss_sens').oninput=draw;
+  document.getElementById('ss_apply').onclick=()=>{document.getElementById('ss_mode').textContent='flagged ✓ → stakeholders';};
+  draw();
+}
+
+/* AGENTIC */
+function agentic(){
+  let scen=0,running=false;
+  document.querySelectorAll('#ag_scen button').forEach(b=>b.onclick=()=>{if(running)return;document.querySelectorAll('#ag_scen button').forEach(z=>z.classList.remove('on'));b.classList.add('on');scen=+b.dataset.v;render();});
+  const feeds=['Large Appliances online orders −18% vs. forecast','Search CVR 2σ below band','Bundle margin below floor on 14 bundles'];
+  const chains=[
+    [['1','Detect','ADS flags Large Appliances online orders −18% vs. forecast (p<0.01)','auto'],
+     ['2','Diagnose','Joins clickstream + on-site signals: fridge PDP add-to-cart collapsing, traffic steady','auto'],
+     ['3','Reason · predict','Forecasts −1.9% online category demand over next 10 days; pre-BF window at risk','auto'],
+     ['4','Draft brief','Composes one-step-ahead summary: what is slipping, projected trajectory, likely drivers','auto'],
+     ['5','Heads-up to online-KPI stakeholders','Predictive brief (emails, Slack, etc.) — "appliances online demand at risk into BF, projected −1.9%" — held for analyst sign-off','gate']],
+    [['1','Detect','Search CVR drops on "refrigerators" query class, 2σ below band','auto'],
+     ['2','Diagnose','On-site relevance signals: low-converting results ranking top-of-rail','auto'],
+     ['3','Reason · predict','Projects −2.1% online category demand; correlates with last ranking index change','auto'],
+     ['4','Draft brief','Summarizes the CVR slip, projected impact, and suspected on-site cause','auto'],
+     ['5','Heads-up to online-KPI stakeholders','Predictive brief to search/merch analytics owners (emails, Slack, etc.) — held for sign-off','gate']],
+    [['1','Detect','Online bundle attach-rate on 14 appliance bundles drops sharply','auto'],
+     ['2','Diagnose','Incrementality signals: 6 of 14 bundles non-incremental online — promo cannibalizing base','auto'],
+     ['3','Reason · predict','Projects continued attach-rate erosion through BF if unflagged','auto'],
+     ['4','Draft brief','Quantifies which bundles are non-incremental and the projected online effect','auto'],
+     ['5','Heads-up to online-KPI stakeholders','Predictive brief to bundle/merch analytics owners (emails, Slack, etc.) — held for sign-off','gate']]
+  ];
+  const wrap=document.getElementById('ag_chain'),feed=document.getElementById('ag_feed'),status=document.getElementById('ag_status');
+  function render(){running=false;status.textContent='idle';
+    feed.innerHTML='<span class="pulse"></span><span>ADS stream — <b>monitoring 50+ KPIs</b> · awaiting trigger</span>';
+    wrap.innerHTML=chains[scen].map((s,i)=>`<div class="step ${s[3]=='gate'?'gate':''}" data-i="${i}"><div class="ic">${s[0]}</div><div class="t"><b>${s[1]}</b><small>${s[2]}</small></div><span class="badge ${s[3]=='gate'?'gate':'auto'}">${s[3]=='gate'?'human gate':'auto'}</span></div>`).join('');}
+  document.getElementById('ag_auto').onclick=function(){this.classList.toggle('on');};
+  document.getElementById('ag_run').onclick=()=>{if(running)return;running=true;render();running=true;
+    const btn=document.getElementById('ag_run');btn.disabled=true;
+    feed.innerHTML='<span class="pulse"></span><span>TRIGGER FIRED — <b>'+feeds[scen]+'</b></span>';status.textContent='running';
+    const steps=[...wrap.querySelectorAll('.step')];
+    steps.forEach((s,i)=>setTimeout(()=>{s.classList.add('on');if(i===steps.length-1){status.textContent='briefed · awaiting sign-off';btn.disabled=false;running=false;}},i*680));};
+  render();
+}
+
+const initFns={4:scenarioSim,5:agentic};
+window.addEventListener('resize',()=>{if(initFns[cur])requestAnimationFrame(initFns[cur]);});
+go(0);
+</script>
+</body>
+</html>

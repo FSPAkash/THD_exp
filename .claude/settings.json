@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -p \"Journey_Past_Present_Future_0527.docx\" word/theme/theme1.xml)",
+      "Bash(unzip -p \"Journey_Past_Present_Future_0527.docx\" word/document.xml)",
+      "PowerShell(Start-Process \"c:\\\\Users\\\\AkashPatil\\\\THD_expansion\\\\THD_Intelligence_At_Scale.html\")"
+    ]
+  }
+}
