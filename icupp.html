@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The AI Factory is I-CUPP — The Home Depot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-sans:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+  --bg-app:#FFFFFF; --bg-chrome:#FAFAFA; --bg-paper:#FFFFFF; --bg-input:#FFFFFF;
+  --bg-hover:#F4F4F4; --bg-stripe:#FAFAFA;
+  --ink:#111111; --ink-2:#3F3F3F; --ink-3:#757575; --ink-4:#A8A8A8;
+  --line:#E5E5E5; --line-2:#EFEFEF; --line-strong:#D0D0D0;
+  --accent:#F96302; --accent-ink:#C24E02; --accent-soft:#FBD9C0; --accent-tint:#FFF3EA;
+  --ok:oklch(0.55 0.12 150); --ok-soft:oklch(0.94 0.05 150);
+  --warn:oklch(0.62 0.13 70); --warn-soft:oklch(0.95 0.06 75); --warn-ink:oklch(0.48 0.13 65);
+  --err:oklch(0.55 0.18 25);
+  --shadow-window:0 1px 0 rgba(0,0,0,.03),0 12px 32px -8px rgba(60,40,20,.18),0 2px 6px rgba(60,40,20,.08);
+  --r-card:6px; --r-input:4px; --r-win:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);font-size:14px;line-height:1.45;letter-spacing:-.005em;
+  background:var(--bg-app);color:var(--ink);overflow:hidden;
+  font-feature-settings:"tnum" 1,"ss01" 1;-webkit-font-smoothing:antialiased}
+.mono{font-variant-numeric:tabular-nums}
+
+.brandbar{position:fixed;top:0;left:0;right:0;height:38px;background:var(--bg-chrome);
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;padding:0 18px;z-index:40}
+.brandbar img{height:18px;width:18px;object-fit:contain}
+.brandbar .t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.brandbar .t em{font-style:normal;color:var(--ink-3);font-weight:600}
+.brandstrip{position:fixed;top:38px;left:0;right:0;height:3px;z-index:41;
+  background:linear-gradient(to right,#F96302 0,#F96302 84%,#F5A623 84%,#F5A623 100%)}
+.statusbar{position:fixed;bottom:0;left:0;right:0;height:34px;background:var(--bg-chrome);
+  border-top:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 18px;z-index:40;
+  font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink-3)}
+.statusbar .ldot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+.statusbar .sep{width:1px;height:14px;background:var(--line)}
+.statusbar .right{margin-left:auto;display:flex;align-items:center;gap:14px}
+
+#deck{position:absolute;top:41px;bottom:34px;left:0;right:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column}
+.slide.active{display:flex}
+.pad{flex:1;display:flex;flex-direction:column;padding:30px 54px 22px;min-height:0;overflow:hidden}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide.active .en{opacity:0;animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both}
+.slide.active .en.d1{animation-delay:.05s}.slide.active .en.d2{animation-delay:.10s}
+.slide.active .en.d3{animation-delay:.16s}.slide.active .en.d4{animation-delay:.22s}
+.slide.active .stag>*{opacity:0;animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both}
+.slide.active .stag>*:nth-child(1){animation-delay:.08s}.slide.active .stag>*:nth-child(2){animation-delay:.16s}
+.slide.active .stag>*:nth-child(3){animation-delay:.24s}.slide.active .stag>*:nth-child(4){animation-delay:.32s}
+.slide.active .stag>*:nth-child(5){animation-delay:.40s}.slide.active .stag>*:nth-child(6){animation-delay:.48s}
+
+.eyebrow{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px}
+.eyebrow .bar{width:22px;height:2px;background:var(--accent)}
+h1{font-size:clamp(28px,3.6vw,42px);font-weight:700;letter-spacing:-.02em;line-height:1.06;color:var(--ink)}
+h1 em{font-style:normal;color:var(--accent-ink)}
+h2{font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:var(--ink);margin-bottom:3px}
+.lede{font-size:13px;color:var(--ink-2);max-width:96ch;margin-top:4px;line-height:1.5}
+.lede b{color:var(--ink);font-weight:600}
+.microlabel{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
+.spacer{flex:1}
+.row{display:flex;gap:10px;align-items:center}
+
+.card{background:var(--bg-paper);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;display:flex;flex-direction:column}
+.card-head{min-height:32px;padding:7px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line-2);
+  background:var(--bg-stripe);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+.card-head .lk{width:18px;height:18px;border-radius:4px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;flex:none}
+.card-head .tail{margin-left:auto;font-weight:600;color:var(--ink-3);letter-spacing:0;text-transform:none;font-size:11px;font-variant-numeric:tabular-nums}
+.card-body{padding:14px;flex:1}
+
+.chip{display:inline-flex;align-items:center;gap:6px;height:21px;padding:0 9px;border-radius:11px;
+  font-size:10px;font-variant-numeric:tabular-nums;font-weight:600;background:var(--bg-hover);color:var(--ink-2);
+  border:1px solid var(--line-2);text-transform:uppercase;letter-spacing:.05em}
+.chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.accent{background:var(--accent-tint);color:var(--accent-ink);border-color:transparent}
+.chip.dim{background:var(--bg-hover);color:var(--ink-3)}
+
+.canvasfill{flex:1;min-height:0;margin-top:8px}
+canvas.full{width:100%;height:100%;display:block}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:10.5px;color:var(--ink-3);align-items:center;text-transform:uppercase;letter-spacing:.06em;font-weight:600;flex-wrap:wrap}
+.legend b{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2)}
+.legend .sq{width:9px;height:9px;border-radius:2px}
+.legend .sq.b{background:var(--ok)} .legend .sq.f{background:var(--accent)}
+
+/* hairline table */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--bg-paper);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+.tbl thead th{background:var(--bg-stripe);border-bottom:1px solid var(--line);padding:8px 12px;text-align:left;
+  font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600;white-space:nowrap}
+.tbl tbody td{padding:9px 12px;border-bottom:1px solid var(--line-2);font-size:12.5px;color:var(--ink);vertical-align:top}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr:nth-child(even) td{background:rgba(0,0,0,0.012)}
+.tbl td.lay{font-weight:700;white-space:nowrap}
+.tbl .lkk{display:inline-flex;width:18px;height:18px;border-radius:4px;background:var(--accent);color:#fff;align-items:center;justify-content:center;font-size:10px;font-weight:800;margin-right:8px}
+.tbl .sub{display:block;font-size:10.5px;color:var(--ink-3);font-weight:400;margin-top:2px}
+
+.callout{padding:12px 15px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--bg-stripe)}
+.callout p{font-size:13px;font-weight:500;color:var(--ink)}
+.callout .o{color:var(--accent-ink);font-weight:700}
+
+/* layer deep-dive grid */
+.ddgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;flex:1;min-height:0;margin-top:10px}
+.ddcol{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;min-height:0}
+.ddcol.proc{border-color:var(--accent-soft)}
+.ddhd{padding:9px 11px;border-bottom:1px solid var(--line-2);background:var(--bg-stripe)}
+.ddcol.proc .ddhd{background:var(--accent-tint)}
+.ddhd .l{display:flex;align-items:center;gap:8px}
+.ddhd .lk{width:22px;height:22px;border-radius:5px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.ddhd .nm{font-size:12px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.ddhd .q{font-size:10px;color:var(--ink-3);margin-top:5px;line-height:1.35}
+.ddbody{padding:10px 11px;flex:1;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.item{font-size:11px;color:var(--ink-2);line-height:1.35;padding-left:13px;position:relative}
+.item::before{content:"";position:absolute;left:1px;top:.5em;width:5px;height:5px;border-radius:50%;background:var(--ok)}
+.item.f::before{background:var(--accent)}
+.ddfoot{padding:8px 11px;border-top:1px solid var(--line-2);background:var(--bg-stripe);display:flex;gap:6px;flex-wrap:wrap}
+
+#nav{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:50;
+  background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 10px;box-shadow:var(--shadow-window)}
+#nav button{border:1px solid var(--line);background:#fff;color:var(--ink-2);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:grid;place-items:center;transition:.12s}
+#nav button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+#nav button:disabled{opacity:.35;cursor:default;background:#fff;color:var(--ink-3);border-color:var(--line)}
+#dots{display:flex;align-items:center;gap:7px;padding:0 2px}
+#dots .d{width:8px;height:8px;border-radius:50%;background:var(--line-strong);cursor:pointer;transition:width .18s,background .18s}
+#dots .d:hover{background:var(--ink-4)}
+#dots .d.on{background:var(--accent);width:22px;border-radius:99px}
+#counter{font-variant-numeric:tabular-nums;font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:.04em;border-left:1px solid var(--line-2);padding-left:10px}
+.pillbtn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:.1em .5em;border-radius:3px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.slide.active .en,.slide.active .stag>*{opacity:1}}
+</style>
+</head>
+<body>
+<div class="brandbar"><img src="THD.png" alt="The Home Depot"><span class="t">The Home Depot <em>· Advanced Analytics · I-CUPP</em></span></div>
+<div class="brandstrip"></div>
+<div id="deck"></div>
+<div class="statusbar mono">
+  <span class="ldot"></span><span>I → C → U → P → P</span>
+  <span class="sep"></span><span>AI FACTORY · RUNNING</span>
+  <span class="sep"></span><span>POSTURE · PROVIDED</span>
+  <span class="right"><span id="sb-pos">01 / 07</span></span>
+</div>
+<div id="nav"><button id="prev" aria-label="Previous">‹</button><button id="next" aria-label="Next">›</button><div id="dots"></div><span id="counter" class="mono">1 / 7</span></div>
+
+<script>
+const slides=[];
+
+/* 1 — TITLE */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="spacer"></div>
+  <div class="eyebrow en"><span class="bar"></span>The Home Depot · Advanced Analytics</div>
+  <h1 class="en d1">The AI Factory <em>is I-CUPP</em><br>— already running at THD</h1>
+  <p class="lede en d2" style="font-size:14px;margin-top:14px;max-width:82ch">I-CUPP is the operating model for intelligence at scale: <b>Infrastructure → Collection → Unification → Processing → Presentation</b>. Every engine this team has shipped already lives on this pipeline. The expansion deepens one layer — Processing — where the new engines live.</p>
+  <div class="row en d4" style="margin-top:30px;gap:10px;flex-wrap:wrap">
+    <div class="card" style="min-width:150px"><div class="card-head"><span class="lk">I</span>Infrastructure</div><div class="card-body" style="padding:11px 13px;font-size:11px;color:var(--ink-3)">BigQuery · 6TB+ store</div></div>
+    <div class="card" style="min-width:150px"><div class="card-head"><span class="lk">C</span>Collection</div><div class="card-body" style="padding:11px 13px;font-size:11px;color:var(--ink-3)">Behavior · KPIs · triggers</div></div>
+    <div class="card" style="min-width:150px"><div class="card-head"><span class="lk">U</span>Unification</div><div class="card-body" style="padding:11px 13px;font-size:11px;color:var(--ink-3)">Stitching · base tables</div></div>
+    <div class="card" style="min-width:150px;border-color:var(--accent-soft)"><div class="card-head" style="background:var(--accent-tint)"><span class="lk">P</span>Processing</div><div class="card-body" style="padding:11px 13px;font-size:11px;color:var(--accent-ink)">The engines · where we expand</div></div>
+    <div class="card" style="min-width:150px"><div class="card-head"><span class="lk">P</span>Presentation</div><div class="card-body" style="padding:11px 13px;font-size:11px;color:var(--ink-3)">Hub · reports · alerts</div></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="row en"><span class="microlabel">Infrastructure · Collection · Unification · Processing · Presentation</span><span class="microlabel" style="margin-left:auto">Confidential — prepared for THD leadership</span></div>
+</div></div>`);
+
+/* 2 — THE FIVE LAYERS */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The operating model — five layers, read in flow</div>
+  <h2 class="en d1">I-CUPP: how intelligence flows from ground to action</h2>
+  <p class="lede en d2">The owner provides the ground (I); we pull raw material (C); connect it into one picture (U); apply the engine to decide (P · Processing); package it so people act and own it (P · Presentation).</p>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:6px">
+  <table class="tbl en d3">
+    <thead><tr><th style="width:170px">Layer</th><th>The question it answers</th><th>What belongs here</th></tr></thead>
+    <tbody>
+      <tr><td class="lay"><span class="lkk">I</span>Infrastructure</td><td>What foundation must exist for this work to run?</td><td>Platforms, environments, access, licensing — used as-is or stood up</td></tr>
+      <tr><td class="lay"><span class="lkk">C</span>Collection</td><td>What raw inputs do we gather, and from where?</td><td>Discovery, inventory, extraction, ingestion, signal capture</td></tr>
+      <tr><td class="lay"><span class="lkk">U</span>Unification</td><td>How do these pieces relate into one picture?</td><td>Lineage, modeling, normalization, entity resolution, single view</td></tr>
+      <tr><td class="lay" style="color:var(--accent-ink)"><span class="lkk">P</span>Processing</td><td>What does the connected data tell us to do?</td><td>Scoring, forecasting, simulation, optimization — <b>the engine</b></td></tr>
+      <tr><td class="lay"><span class="lkk">P</span>Presentation</td><td>How do we hand this over so people can act?</td><td>Reports, dashboards, alerts, copilots, decision packages</td></tr>
+    </tbody>
+  </table>
+  <div class="callout en d4" style="margin-top:14px"><p>The two P's are distinct: <span class="o">Processing</span> is the analysis engine; <span class="o">Presentation</span> is the packaging and handover. Keep them separate.</p></div>
+  </div>
+</div></div>`);
+
+/* 3 — THD MAPPED ONTO I-CUPP (animated flow) */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The proof — THD's factory mapped onto I-CUPP</div>
+  <h2 class="en d1">THD already runs a full I-CUPP pipeline</h2>
+  <p class="lede en d2">Every layer is live on Home Depot's own data. <b style="color:var(--ok)">Green = built &amp; in production.</b> <b style="color:var(--accent-ink)">Orange = where the new engines extend Processing.</b></p>
+  <div class="canvasfill"><canvas id="flow" class="full"></canvas></div>
+  <div class="legend">
+    <b><span class="sq b"></span> Built &amp; in production</b>
+    <b><span class="sq f"></span> Expanding — new engines (Processing)</b>
+    <span style="margin-left:auto;color:var(--ink-3)">Infrastructure posture — <b style="color:var(--ink-2)">Provided</b> (THD-owned, used as-is)</span>
+  </div>
+</div></div>`);
+
+/* 4 — LAYER DEEP DIVE */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>Layer by layer — THD contents, mode & engine</div>
+  <h2 class="en d1">What sits in each layer, and how it's delivered</h2>
+  <div class="ddgrid stag">
+    <div class="ddcol">
+      <div class="ddhd"><div class="l"><span class="lk">I</span><span class="nm">Infrastructure</span></div><div class="q">What foundation runs the work?</div></div>
+      <div class="ddbody">
+        <div class="item">BigQuery data platform</div>
+        <div class="item">6TB+ historical store</div>
+        <div class="item">Access &amp; compute accounts</div>
+        <div class="item">Tableau / Hub hosting</div>
+      </div>
+      <div class="ddfoot"><span class="chip dim">Provided</span><span class="chip dim">Owner-owned</span></div>
+    </div>
+    <div class="ddcol">
+      <div class="ddhd"><div class="l"><span class="lk">C</span><span class="nm">Collection</span></div><div class="q">What raw inputs, from where?</div></div>
+      <div class="ddbody">
+        <div class="item">Online behavior · clickstream</div>
+        <div class="item">HHID · Visit · Segment</div>
+        <div class="item">Sales · demand · bundles</div>
+        <div class="item">OKR/BOF · AB · Workfront/JIRA</div>
+      </div>
+      <div class="ddfoot"><span class="chip accent">Agentic</span><span class="chip dim">Read-only</span></div>
+    </div>
+    <div class="ddcol">
+      <div class="ddhd"><div class="l"><span class="lk">U</span><span class="nm">Unification</span></div><div class="q">How do pieces relate?</div></div>
+      <div class="ddbody">
+        <div class="item">Data stitching across HHID/Visit/Segment</div>
+        <div class="item">Base-table generation in BigQuery</div>
+        <div class="item">Segment / entity resolution</div>
+        <div class="item">Unified layer behind the Hub</div>
+      </div>
+      <div class="ddfoot"><span class="chip accent">Hybrid</span></div>
+    </div>
+    <div class="ddcol proc">
+      <div class="ddhd"><div class="l"><span class="lk">P</span><span class="nm">Processing</span></div><div class="q">What does the data tell us to do?</div></div>
+      <div class="ddbody">
+        <div class="item">PLI counterfactual · 96%</div>
+        <div class="item">Bundle · 1 → 7,299 parallel</div>
+        <div class="item">ADS detection · AB-test AIR</div>
+        <div class="item f">+ Scenario Sim · Agentic · Scoring</div>
+      </div>
+      <div class="ddfoot"><span class="chip accent">Engine</span><span class="chip accent">Expanding</span></div>
+    </div>
+    <div class="ddcol">
+      <div class="ddhd"><div class="l"><span class="lk">P</span><span class="nm">Presentation</span></div><div class="q">How is it handed over?</div></div>
+      <div class="ddbody">
+        <div class="item">Analytics Hub · self-serve</div>
+        <div class="item">Auto reports · OKR/BOF dashboards</div>
+        <div class="item">Real-time KPI alerts</div>
+        <div class="item">Gen-AI conversational layer</div>
+      </div>
+      <div class="ddfoot"><span class="chip accent">Hybrid</span></div>
+    </div>
+  </div>
+</div></div>`);
+
+/* 5 — PROCESSING IS WHERE WE EXPAND */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The expansion lives in one layer — Processing</div>
+  <h2 class="en d1">I, C, U and Presentation are proven. Processing is where we go deeper.</h2>
+  <p class="lede en d2">The foundation, collection, unification and handover are all running. Growing the team adds <b>new engines to the Processing layer</b> — each evolving from a proven one — without disturbing the rest of the pipeline.</p>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:6px">
+  <table class="tbl en d3">
+    <thead><tr><th>Proven engine (Processing)</th><th>New engine (Processing)</th><th>What it produces</th></tr></thead>
+    <tbody>
+      <tr><td>Counterfactual forecasting (PLI)</td><td style="font-weight:700;color:var(--accent-ink)">Scenario Simulation</td><td>What-if risk bands on live market intel</td></tr>
+      <tr><td>ADS detection + automation</td><td style="font-weight:700;color:var(--accent-ink)">Agentic Action Layer</td><td>Predictive one-step-ahead stakeholder heads-up</td></tr>
+      <tr><td>Incrementality + user-intent</td><td style="font-weight:700;color:var(--accent-ink)">Feature-Impact Scoring</td><td>Pre-launch ROI · go / no-go</td></tr>
+      <tr><td>Gen-AI wrapper</td><td style="font-weight:700;color:var(--accent-ink)">Gen-AI Copilots in Hub</td><td>NL KPI querying · narrative insights</td></tr>
+    </tbody>
+  </table>
+  <div class="callout en d4" style="margin-top:14px"><p>Recommendations stay advisory — Processing proposes, the business decides. <span class="o">Same pipeline, deeper engine.</span></p></div>
+  </div>
+</div></div>`);
+
+/* 6 — POSTURE & DELIVERY MODE */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>Posture & delivery — how each layer runs</div>
+  <h2 class="en d1">A complete, scope-flagged I-CUPP map</h2>
+  <p class="lede en d2">Infrastructure is <b>Provided</b> — THD-owned, used as-is, so provisioning sits out of scope. Everything above it is in-scope delivery, increasingly agentic up the stack.</p>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:6px">
+  <table class="tbl en d3">
+    <thead><tr><th style="width:160px">Layer</th><th>Execution mode</th><th>Engine / tooling</th><th>Posture / scope</th></tr></thead>
+    <tbody>
+      <tr><td class="lay"><span class="lkk">I</span>Infrastructure</td><td>—</td><td>BigQuery · Tableau · Hub host</td><td><span class="chip dim">Provided · provisioning out of scope</span></td></tr>
+      <tr><td class="lay"><span class="lkk">C</span>Collection</td><td>Agentic</td><td>Automated ingestion · API triggers</td><td><span class="chip ok">In scope</span></td></tr>
+      <tr><td class="lay"><span class="lkk">U</span>Unification</td><td>Hybrid</td><td>BigQuery base tables · stitching</td><td><span class="chip ok">In scope</span></td></tr>
+      <tr><td class="lay" style="color:var(--accent-ink)"><span class="lkk">P</span>Processing</td><td>Hybrid → Agentic</td><td>Proprietary engines + agentic LLM</td><td><span class="chip accent">In scope · expanding</span></td></tr>
+      <tr><td class="lay"><span class="lkk">P</span>Presentation</td><td>Hybrid</td><td>Analytics Hub · Gen-AI layer</td><td><span class="chip ok">In scope</span></td></tr>
+    </tbody>
+  </table>
+  <div class="callout en d4" style="margin-top:14px"><p>Long-term platform operation stays owner-side. <span class="o">The engagement deepens Processing and the Presentation surfaces it ships through.</span></p></div>
+  </div>
+</div></div>`);
+
+/* 7 — CLOSE */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The takeaway</div>
+  <h2 class="en d1">THD doesn't need to start an AI Factory — it's already running one.</h2>
+  <p class="lede en d2" style="max-width:84ch">All five I-CUPP layers are live on Home Depot's own data, in production, today. The opportunity isn't to stand up a pipeline — it's to <b>deepen the Processing layer</b> with new engines, delivered by more capacity of the same proven caliber.</p>
+  <div class="row stag" style="margin-top:24px;gap:12px;flex-wrap:wrap">
+    <div class="card" style="flex:1;min-width:230px"><div class="card-head"><span class="lk">I·C·U·P</span>Proven &amp; running</div><div class="card-body" style="font-size:12px;color:var(--ink-2);line-height:1.5">Infrastructure, Collection, Unification and Presentation are all live — a full pipeline on THD data.</div></div>
+    <div class="card" style="flex:1;min-width:230px;border-color:var(--accent-soft)"><div class="card-head" style="background:var(--accent-tint)"><span class="lk">P</span>Where we expand</div><div class="card-body" style="font-size:12px;color:var(--ink-2);line-height:1.5">New Processing engines — Scenario Simulation, Agentic, Feature Scoring — each evolving from proven work.</div></div>
+  </div>
+  <div class="callout en" style="margin-top:22px"><p>The pipeline is built and de-risked. <span class="o">Grow the team, deepen Processing, compound the factory.</span></p></div>
+  <div class="spacer"></div>
+</div></div>`);
+
+/* ===== ENGINE ===== */
+const deck=document.getElementById('deck');
+deck.innerHTML=slides.join('');
+const S=[...document.querySelectorAll('.slide')];
+let cur=0;
+const dots=document.getElementById('dots');
+S.forEach((_,i)=>{const d=document.createElement('div');d.className='d';d.onclick=()=>go(i);dots.appendChild(d)});
+const dEls=[...dots.children];
+const pad2=n=>String(n).padStart(2,'0');
+const REDUCE=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const easeOut=t=>1-Math.pow(1-t,3);
+let rafId=null;
+function stopRAF(){if(rafId){cancelAnimationFrame(rafId);rafId=null;}}
+function animate(dur,onFrame){stopRAF();const t0=performance.now();function frame(now){const p=Math.min(1,(now-t0)/dur);onFrame(p);if(p<1)rafId=requestAnimationFrame(frame);else rafId=null;}rafId=requestAnimationFrame(frame);}
+
+function go(i){
+  cur=Math.max(0,Math.min(S.length-1,i));
+  S.forEach((s,k)=>s.classList.toggle('active',k===cur));
+  dEls.forEach((d,k)=>d.classList.toggle('on',k===cur));
+  document.getElementById('counter').textContent=(cur+1)+' / '+S.length;
+  document.getElementById('sb-pos').textContent=pad2(cur+1)+' / '+pad2(S.length);
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===S.length-1;
+  stopRAF();
+  if(initFns[cur])requestAnimationFrame(()=>requestAnimationFrame(initFns[cur]));
+}
+document.getElementById('next').onclick=()=>go(cur+1);
+document.getElementById('prev').onclick=()=>go(cur-1);
+window.addEventListener('keydown',e=>{const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown')go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);});
+
+function fit(c){const r=c.getBoundingClientRect();const dpr=devicePixelRatio||1;
+  c.width=r.width*dpr;c.height=r.height*dpr;const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return [x,r.width,r.height];}
+const C_ACC='#F96302',C_ACC2='#C24E02',C_LINE='#E5E5E5',C_INK='#111111',C_INK2='#3F3F3F',C_INK3='#757575',C_OK='#2e9e4f',C_OKB='#e7f4e9';
+function rr(x,a,b,w,h,r){x.beginPath();x.roundRect(a,b,w,h,r);}
+function clamp(v){return Math.max(0,Math.min(1,v));}
+
+/* 3 — I-CUPP FLOW (self-assembling, THD contents per layer) */
+function flowViz(){
+  const c=document.getElementById('flow');
+  const layers=[
+    {k:'I',nm:'Infrastructure',items:['BigQuery','6TB+ store','Access'],state:'b'},
+    {k:'C',nm:'Collection',items:['Clickstream','HHID·Visit','KPIs · triggers'],state:'b'},
+    {k:'U',nm:'Unification',items:['Stitching','Base tables','Single view'],state:'b'},
+    {k:'P',nm:'Processing',items:['PLI · Bundle','ADS · AIR','+ Sim · Agentic'],state:'f'},
+    {k:'P',nm:'Presentation',items:['Analytics Hub','Reports · alerts','Gen-AI layer'],state:'b'}
+  ];
+  function render(progress){
+    const r=fit(c);const x=r[0],W=r[1],H=r[2];x.clearRect(0,0,W,H);x.textBaseline='middle';
+    const n=layers.length,gap=18,pad=6;
+    const bw=(W-pad*2-gap*(n-1))/n, bx0=pad;
+    const bh=Math.min(H-30,210), by=(H-bh)/2;
+    // connecting arrows behind
+    for(let i=0;i<n-1;i++){
+      const ax=bx0+bw*(i+1)+gap*i, bxn=ax+gap;
+      const ay=by+bh/2;
+      const ap=clamp((progress-(i*0.13+0.18))/0.18);
+      if(ap<=0)continue;
+      x.strokeStyle='rgba(249,99,2,'+(0.4*ap)+')';x.lineWidth=1.6;
+      const ex=ax+(bxn-ax)*ap;
+      x.beginPath();x.moveTo(ax+2,ay);x.lineTo(ex-2,ay);x.stroke();
+      if(ap>=1){x.fillStyle=C_ACC;x.beginPath();x.moveTo(bxn-2,ay);x.lineTo(bxn-8,ay-4);x.lineTo(bxn-8,ay+4);x.closePath();x.fill();}
+    }
+    layers.forEach((L,i)=>{
+      const a=bx0+(bw+gap)*i;
+      const ap=clamp((progress-i*0.13)/0.22);
+      if(ap<=0)return;
+      const e=easeOut(ap);
+      x.save();x.globalAlpha=e;
+      const isF=L.state==='f';
+      // card
+      x.fillStyle='#fff';x.strokeStyle=isF?C_ACC:C_LINE;x.lineWidth=isF?1.6:1;
+      rr(x,a,by+(1-e)*8,bw,bh,8);x.fill();x.stroke();
+      // header strip
+      x.fillStyle=isF?'#FFF3EA':'#FAFAFA';rr(x,a,by+(1-e)*8,bw,38,8);x.fill();
+      x.fillStyle='#fff';x.fillRect(a,by+30+(1-e)*8,bw,8);
+      // letter badge
+      x.fillStyle=C_ACC;rr(x,a+11,by+10+(1-e)*8,22,22,5);x.fill();
+      x.fillStyle='#fff';x.font='800 13px Manrope';x.textAlign='center';x.fillText(L.k,a+22,by+22+(1-e)*8);
+      // name
+      x.fillStyle=isF?C_ACC2:C_INK;x.font='700 12px Manrope';x.textAlign='left';x.fillText(L.nm,a+40,by+22+(1-e)*8);
+      // items
+      x.textAlign='left';
+      L.items.forEach((it,j)=>{
+        const iy=by+62+j*30+(1-e)*8;
+        x.fillStyle=isF&&j===2?C_ACC:C_OK;x.beginPath();x.arc(a+15,iy,3.5,0,7);x.fill();
+        x.fillStyle=C_INK2;x.font='600 11px Manrope';x.fillText(it,a+25,iy);
+      });
+      // status chip
+      const cy=by+bh-22;
+      x.fillStyle=isF?'#FFF3EA':C_OKB;rr(x,a+11,cy-9,isF?78:54,18,4);x.fill();
+      x.fillStyle=isF?C_ACC2:C_OK;x.font='700 9px Manrope';x.textAlign='left';
+      x.fillText(isF?'EXPANDING':'BUILT',a+18,cy);
+      x.restore();
+    });
+  }
+  if(REDUCE){render(1);}else{animate(2000,render);}
+}
+
+const initFns={2:flowViz};
+window.addEventListener('resize',()=>{if(initFns[cur])requestAnimationFrame(initFns[cur]);});
+go(0);
+</script>
+</body>
+</html>

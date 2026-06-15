@@ -180,16 +180,64 @@ input[type=range]{width:100%;accent-color:var(--accent);height:4px;cursor:pointe
 .feed .pulse{width:8px;height:8px;border-radius:50%;background:var(--err);animation:blink 1s infinite;flex:none}
 .feed b{color:var(--ink);font-weight:700}
 
-#nav{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:50;
-  background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 10px;box-shadow:var(--shadow-window)}
-#nav button{border:1px solid var(--line);background:#fff;color:var(--ink-2);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:grid;place-items:center;transition:.12s}
+/* I-CUPP — layer badges, flow viz, deep-dive grid, table */
+.canvasfill{flex:1;min-height:0;margin-top:8px}
+canvas.full{width:100%;height:100%;display:block}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:10.5px;color:var(--ink-3);align-items:center;text-transform:uppercase;letter-spacing:.06em;font-weight:600;flex-wrap:wrap}
+.legend b{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2)}
+.legend .sq{width:9px;height:9px;border-radius:2px}
+.legend .sq.b{background:var(--ok)} .legend .sq.f{background:var(--accent)}
+.lk{width:18px;height:18px;border-radius:4px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;flex:none}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--bg-paper);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+.tbl thead th{background:var(--bg-stripe);border-bottom:1px solid var(--line);padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600;white-space:nowrap}
+.tbl tbody td{padding:9px 12px;border-bottom:1px solid var(--line-2);font-size:12.5px;color:var(--ink);vertical-align:top}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr:nth-child(even) td{background:rgba(0,0,0,0.012)}
+.tbl td.lay{font-weight:700;white-space:nowrap}
+.tbl .lkk{display:inline-flex;width:18px;height:18px;border-radius:4px;background:var(--accent);color:#fff;align-items:center;justify-content:center;font-size:10px;font-weight:800;margin-right:8px;vertical-align:-3px}
+.tbl .sub{display:block;font-size:10.5px;color:var(--ink-3);font-weight:400;margin-top:2px}
+/* I-CUPP flow columns — same hairline idiom as phase columns */
+.icupp{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;flex:1;min-height:0;margin-top:10px;align-items:stretch}
+.icol{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;min-height:0}
+.icol.exp{border-color:var(--accent-soft)}
+.icol .ihd{padding:9px 11px;border-bottom:1px solid var(--line-2);background:var(--bg-stripe);display:flex;align-items:center;gap:9px}
+.icol.exp .ihd{background:var(--accent-tint)}
+.icol .ihd .lk{width:22px;height:22px;border-radius:5px;font-size:12px}
+.icol .ihd .nm{font-size:12px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.icol.exp .ihd .nm{color:var(--accent-ink)}
+.icol .ibody{padding:11px;flex:1;display:flex;flex-direction:column;gap:8px}
+.iitem{font-size:11.5px;color:var(--ink-2);line-height:1.3;padding-left:14px;position:relative}
+.iitem::before{content:"";position:absolute;left:2px;top:.45em;width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.iitem.f{color:var(--accent-ink);font-weight:600} .iitem.f::before{background:var(--accent)}
+.icol .ifoot{padding:8px 11px;border-top:1px solid var(--line-2);background:var(--bg-stripe);display:flex}
+.istat{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;background:var(--ok-soft);color:var(--ok)}
+.istat.exp{background:var(--accent-tint);color:var(--accent-ink)}
+.iarrow{display:flex;align-items:center;color:var(--accent);opacity:.45;font-size:14px;margin:0 -6px;z-index:1}
+.ddgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;flex:1;min-height:0;margin-top:10px}
+.ddcol{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;min-height:0}
+.ddcol.proc{border-color:var(--accent-soft)}
+.ddhd{padding:9px 11px;border-bottom:1px solid var(--line-2);background:var(--bg-stripe)}
+.ddcol.proc .ddhd{background:var(--accent-tint)}
+.ddhd .l{display:flex;align-items:center;gap:8px}
+.ddhd .lk{width:22px;height:22px;border-radius:5px;font-size:12px}
+.ddhd .nm{font-size:12px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.ddhd .q{font-size:10px;color:var(--ink-3);margin-top:5px;line-height:1.35}
+.ddbody{padding:10px 11px;flex:1;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.dditem{font-size:11px;color:var(--ink-2);line-height:1.35;padding-left:13px;position:relative}
+.dditem::before{content:"";position:absolute;left:1px;top:.5em;width:5px;height:5px;border-radius:50%;background:var(--ok)}
+.dditem.f::before{background:var(--accent)}
+.ddfoot{padding:8px 11px;border-top:1px solid var(--line-2);background:var(--bg-stripe);display:flex;gap:6px;flex-wrap:wrap}
+
+/* nav lives inside the status-bar footer, centered */
+#nav{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:9px}
+#nav button{border:1px solid var(--line);background:#fff;color:var(--ink-2);width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;display:grid;place-items:center;transition:.12s;line-height:1}
 #nav button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 #nav button:disabled{opacity:.35;cursor:default;background:#fff;color:var(--ink-3);border-color:var(--line)}
-#dots{display:flex;align-items:center;gap:7px;padding:0 2px}
-#dots .d{width:8px;height:8px;border-radius:50%;background:var(--line-strong);cursor:pointer;transition:width .18s,background .18s}
+#dots{display:flex;align-items:center;gap:6px;padding:0 2px}
+#dots .d{width:7px;height:7px;border-radius:50%;background:var(--line-strong);cursor:pointer;transition:width .18s,background .18s}
 #dots .d:hover{background:var(--ink-4)}
-#dots .d.on{background:var(--accent);width:22px;border-radius:99px}
-#counter{font-variant-numeric:tabular-nums;font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:.04em;padding-left:4px;border-left:1px solid var(--line-2);padding-left:10px}
+#dots .d.on{background:var(--accent);width:18px;border-radius:99px}
+.hide-sm{} @media (max-width:880px){.hide-sm{display:none}}
 .pillbtn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:.1em .5em;border-radius:3px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.slide.active .en,.slide.active .stag>*{opacity:1}}
 </style>
@@ -200,15 +248,9 @@ input[type=range]{width:100%;accent-color:var(--accent);height:4px;cursor:pointe
 <div id="deck"></div>
 <div class="statusbar mono">
   <span class="ldot"></span><span>AI FACTORY · RUNNING</span>
-  <span class="sep"></span><span>4 YRS ON THD DATA</span>
-  <span class="sep"></span><span>EXPANSION PROPOSAL</span>
-  <span class="right"><span id="sb-pos">01 / 07</span></span>
-</div>
-<div id="nav">
-  <button id="prev" aria-label="Previous">‹</button>
-  <button id="next" aria-label="Next">›</button>
-  <div id="dots"></div>
-  <span id="counter" class="mono">1 / 7</span>
+  <span class="sep"></span><span class="hide-sm">I → C → U → P → P</span>
+  <div id="nav"><button id="prev" aria-label="Previous">‹</button><div id="dots"></div><button id="next" aria-label="Next">›</button></div>
+  <span class="right"><span id="sb-pos">01 / 10</span></span>
 </div>
 
 <script>
@@ -237,12 +279,12 @@ slides.push(`
   <h2 class="en d1">The engines work, at Home Depot scale</h2>
   <p class="lede en d2">Four years of measurable wins on THD's own data — the credibility behind everything we propose next.</p>
   <div class="grid stag" style="grid-template-columns:repeat(3,1fr);margin-top:20px">
-    <div class="stat"><div class="label">PLI · model accuracy</div><div class="value o mono"><span data-count="96">0</span><span class="u">%</span></div><div class="ctx"><b>100% traffic</b> coverage · 15 reports / 3-wk cycle</div></div>
-    <div class="stat"><div class="label">Bundle incrementality</div><div class="value mono">1 → <span data-count="7299">0</span></div><div class="ctx">From one model at a time to <b>7,299 bundles in a single run</b></div></div>
-    <div class="stat"><div class="label">Issue resolution · ADS</div><div class="value ok mono"><span data-count="96">0</span><span class="u">%</span> faster</div><div class="ctx"><b>50h → 2h</b>/wk · adopted cross-team</div></div>
-    <div class="stat"><div class="label">AB analysis · AIR</div><div class="value mono"><span data-count="90">0</span><span class="u">%</span> faster</div><div class="ctx">JIRA/Workfront · <b>AIR in BigQuery</b> · governed</div></div>
-    <div class="stat"><div class="label">Forecast · Tier-1 exo</div><div class="value o mono"><span data-count="95.8" data-dec="1">0</span><span class="u">%</span></div><div class="ctx"><b>MAPE 2.29 / 4.23</b> · most reliable exo variable</div></div>
-    <div class="stat"><div class="label">Gen-AI coverage</div><div class="value mono"><span data-count="6">0</span><span class="u">TB+</span></div><div class="ctx">Multi-agent NL → SQL/Python · <b>22 OKRs · 50+ BOF</b></div></div>
+    <div class="stat"><div class="label">Post-Launch Incrementality (PLI) · accuracy</div><div class="value o mono"><span data-count="96">0</span><span class="u">%</span></div><div class="ctx"><b>100% traffic</b> coverage · 15 reports / 3-wk cycle</div></div>
+    <div class="stat"><div class="label">Bundle incrementality</div><div class="value mono">1 → <span data-count="7299">0</span></div><div class="ctx">From one model at a time to <b>7,299 bundles in a single run</b> · +12.2% demand</div></div>
+    <div class="stat"><div class="label">Anomaly Detection System (ADS) · resolution</div><div class="value ok mono"><span data-count="96">0</span><span class="u">%</span> faster</div><div class="ctx"><b>50h → 2h</b>/wk · adopted cross-team</div></div>
+    <div class="stat"><div class="label">AB analysis · AIR</div><div class="value mono"><span data-count="90">0</span><span class="u">%</span> faster</div><div class="ctx">JIRA/Workfront · <b>Annualized Incremental Revenue (AIR)</b> in BigQuery</div></div>
+    <div class="stat"><div class="label">Forecast · Tier-1 exogenous</div><div class="value o mono"><span data-count="95.8" data-dec="1">0</span><span class="u">%</span></div><div class="ctx">Train/Test error <b>MAPE 2.29 / 4.23</b> · most reliable exo (exogenous) variable</div></div>
+    <div class="stat"><div class="label">Generative AI (Gen-AI) coverage</div><div class="value mono"><span data-count="6">0</span><span class="u">TB+</span></div><div class="ctx">Multi-agent natural language → SQL/Python · <b>22 OKRs · 50+ Bottom-of-Funnel KPIs</b></div></div>
   </div>
 </div></div>`);
 
@@ -254,12 +296,12 @@ slides.push(`
   <p class="lede en d2">Not isolated projects. Each engine <b>builds</b> on a proven one, <b>evolves</b> into the Analytics Hub, and <b>expands</b> into the future — same data, compounding. The factory runs today and keeps growing.</p>
   <div class="phase stag">
     <div class="phasecol">
-      <div class="phasehd"><span class="ph">Build · Past</span><span class="sub">Proven, in production</span></div>
+      <div class="phasehd"><span class="ph">Built · Past</span><span class="sub">Proven, in production</span></div>
       <div class="phasebody">
         <div class="engine"><div class="et"><span class="cdot b"></span>Post-Launch Incrementality</div><div class="ed">Counterfactual baseline · <span class="m">96% accuracy</span></div></div>
         <div class="engine"><div class="et"><span class="cdot b"></span>Bundle Incrementality</div><div class="ed">PLI parallelized · <span class="m">1 → 7,299 in one run</span></div></div>
-        <div class="engine"><div class="et"><span class="cdot b"></span>Anomaly Detection (ADS)</div><div class="ed">Real-time KPI · <span class="m">96% faster</span></div></div>
-        <div class="engine"><div class="et"><span class="cdot b"></span>AB-Test AIR · Forecasting</div><div class="ed">90% faster · 95.8% accuracy</div></div>
+        <div class="engine"><div class="et"><span class="cdot b"></span>Anomaly Detection (ADS)</div><div class="ed">Real-time KPI (Key Performance Indicator) · <span class="m">96% faster</span></div></div>
+        <div class="engine"><div class="et"><span class="cdot b"></span>AB-Test AIR · Forecasting</div><div class="ed">Annualized Incremental Revenue · 90% faster · 95.8% acc.</div></div>
       </div>
     </div>
     <div class="phasecol">
@@ -267,8 +309,8 @@ slides.push(`
       <div class="phasebody">
         <div class="engine"><div class="et"><span class="cdot p"></span>Prediction Hub</div><div class="ed">PLI → self-serve, multi-KPI parallel runs</div></div>
         <div class="engine"><div class="et"><span class="cdot p"></span>Reporting Hub</div><div class="ed">Auto reports → analyst self-service</div></div>
-        <div class="engine"><div class="et"><span class="cdot p"></span>OKR / BOF Suite</div><div class="ed">22 OKRs · 50+ KPIs · automated pipeline</div></div>
-        <div class="engine"><div class="et"><span class="cdot p"></span>Gen-AI Wrapper</div><div class="ed">6TB+ conversational · NL → code</div></div>
+        <div class="engine"><div class="et"><span class="cdot p"></span>OKR / BOF Suite</div><div class="ed">Objectives &amp; Key Results · Bottom-of-Funnel · automated pipeline</div></div>
+        <div class="engine"><div class="et"><span class="cdot p"></span>Gen-AI Wrapper</div><div class="ed">6TB+ conversational · natural language (NL) → code</div></div>
       </div>
     </div>
     <div class="phasecol future">
@@ -276,28 +318,115 @@ slides.push(`
       <div class="phasebody">
         <div class="engine"><div class="et"><span class="cdot f"></span>Scenario Simulation</div><div class="ed">Evolves from counterfactual forecasting</div></div>
         <div class="engine"><div class="et"><span class="cdot f"></span>Agentic Action Layer</div><div class="ed">Evolves from ADS detection</div></div>
-        <div class="engine"><div class="et"><span class="cdot f"></span>Feature-Impact Scoring</div><div class="ed">Pre-launch ROI · incrementality + intent</div></div>
+        <div class="engine"><div class="et"><span class="cdot f"></span>Feature-Impact Scoring</div><div class="ed">Pre-launch ROI (Return on Investment) · incrementality + intent</div></div>
         <div class="engine"><div class="et"><span class="cdot f"></span>Gen-AI Copilots in Hub</div><div class="ed">NL KPI querying · narrative insights</div></div>
       </div>
     </div>
   </div>
 </div></div>`);
 
-/* 4 — ALREADY ADOPTED */
+/* 4 — I-CUPP FRAMEWORK OVERVIEW */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The operating model behind the factory — I-CUPP</div>
+  <h2 class="en d1">A factory needs a production line. Ours is I-CUPP.</h2>
+  <p class="lede en d2">Every engine runs the same five-layer line, read in flow: the owner provides the ground (I); we pull raw material (C); connect it into one picture (U); apply the engine to decide (P · Processing); package it so people act and own it (P · Presentation).</p>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:6px">
+  <table class="tbl en d3">
+    <thead><tr><th style="width:170px">Layer</th><th>The question it answers</th><th>What belongs here</th></tr></thead>
+    <tbody>
+      <tr><td class="lay"><span class="lkk">I</span>Infrastructure</td><td>What foundation must exist for this work to run?</td><td>Platforms, environments, access, licensing — used as-is or stood up</td></tr>
+      <tr><td class="lay"><span class="lkk">C</span>Collection</td><td>What raw inputs do we gather, and from where?</td><td>Discovery, inventory, extraction, ingestion, signal capture</td></tr>
+      <tr><td class="lay"><span class="lkk">U</span>Unification</td><td>How do these pieces relate into one picture?</td><td>Lineage, modeling, normalization, entity resolution, single view</td></tr>
+      <tr><td class="lay" style="color:var(--accent-ink)"><span class="lkk">P</span>Processing</td><td>What does the connected data tell us to do?</td><td>Scoring, forecasting, simulation, optimization — <b>the engine</b></td></tr>
+      <tr><td class="lay"><span class="lkk">P</span>Presentation</td><td>How do we hand this over so people can act?</td><td>Reports, dashboards, alerts, copilots, decision packages</td></tr>
+    </tbody>
+  </table>
+  <div class="callout en d4" style="margin-top:14px"><p>The two P's stay distinct: <span class="o">Processing</span> is the analysis engine; <span class="o">Presentation</span> is the packaging and handover.</p></div>
+  </div>
+</div></div>`);
+
+/* 5 — THD MAPPED ONTO I-CUPP (animated flow) */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The proof — the factory already runs every layer</div>
+  <h2 class="en d1">THD already runs a full I-CUPP pipeline</h2>
+  <p class="lede en d2">The Built → Evolve → Expand engines map cleanly onto the five layers, all live on Home Depot's own data. <b style="color:var(--ok)">Green = built &amp; in production.</b> <b style="color:var(--accent-ink)">Orange = where the expansion deepens both P's.</b></p>
+  <div class="icupp stag">
+    <div class="icol">
+      <div class="ihd"><span class="lk">I</span><span class="nm">Infrastructure</span></div>
+      <div class="ibody"><div class="iitem">BigQuery platform</div><div class="iitem">6TB+ data store</div><div class="iitem">Access &amp; compute</div></div>
+      <div class="ifoot"><span class="istat">Built</span></div>
+    </div>
+    <div class="icol">
+      <div class="ihd"><span class="lk">C</span><span class="nm">Collection</span></div>
+      <div class="ibody"><div class="iitem">Clickstream · behavior</div><div class="iitem">HHID · Visit · Segment</div><div class="iitem">Sales · demand · bundles</div><div class="iitem">OKR/BOF · AB triggers</div></div>
+      <div class="ifoot"><span class="istat">Built</span></div>
+    </div>
+    <div class="icol">
+      <div class="ihd"><span class="lk">U</span><span class="nm">Unification</span></div>
+      <div class="ibody"><div class="iitem">Data stitching</div><div class="iitem">Base-table generation</div><div class="iitem">Segment resolution</div><div class="iitem">Single view (Hub)</div></div>
+      <div class="ifoot"><span class="istat">Built</span></div>
+    </div>
+    <div class="icol exp">
+      <div class="ihd"><span class="lk">P</span><span class="nm">Processing</span></div>
+      <div class="ibody"><div class="iitem">PLI · Bundle</div><div class="iitem">ADS · AB-test AIR</div><div class="iitem">Forecasting · exo</div><div class="iitem f">+ Scenario Simulation</div><div class="iitem f">+ Agentic · Scoring</div></div>
+      <div class="ifoot"><span class="istat exp">Built + Expanding</span></div>
+    </div>
+    <div class="icol exp">
+      <div class="ihd"><span class="lk">P</span><span class="nm">Presentation</span></div>
+      <div class="ibody"><div class="iitem">Analytics Hub</div><div class="iitem">Reports · dashboards · alerts</div><div class="iitem">Gen-AI conversational</div><div class="iitem f">+ Predictive heads-up</div><div class="iitem f">+ Hub copilots</div></div>
+      <div class="ifoot"><span class="istat exp">Built + Expanding</span></div>
+    </div>
+  </div>
+  <div class="legend">
+    <b><span class="sq b"></span> Built &amp; in production</b>
+    <b><span class="sq f"></span> Expanding — both P's (Processing &amp; Presentation)</b>
+    <span style="margin-left:auto;color:var(--ink-3)">Infrastructure posture — <b style="color:var(--ink-2)">Provided</b> (THD-owned, used as-is)</span>
+  </div>
+</div></div>`);
+
+/* 6 — EXPANSION DEEPENS PROCESSING */
+slides.push(`
+<div class="slide"><div class="pad">
+  <div class="eyebrow en"><span class="bar"></span>The expansion deepens the two P's</div>
+  <h2 class="en d1">I, C and U are set. We go deeper on Processing — and the Presentation it ships through.</h2>
+  <p class="lede en d2">The foundation, collection and unification all run today. Growing the team adds <b>new engines to Processing</b> — each evolving from a proven one — and new <b>Presentation</b> surfaces (predictive heads-up, Hub copilots) to deliver them, without disturbing the rest of the pipeline.</p>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:6px">
+  <table class="tbl en d3">
+    <thead><tr><th style="width:130px">Layer</th><th>Built on (proven)</th><th>New capability</th><th>What it produces</th></tr></thead>
+    <tbody>
+      <tr><td class="lay"><span class="lkk">P</span>Processing</td><td>Counterfactual forecasting (PLI)</td><td style="font-weight:700;color:var(--accent-ink)">Scenario Simulation</td><td>What-if risk bands on live market intel</td></tr>
+      <tr><td class="lay"><span class="lkk">P</span>Processing</td><td>ADS detection + automation</td><td style="font-weight:700;color:var(--accent-ink)">Agentic Action Layer</td><td>Reasoned diagnosis &amp; trajectory forecast</td></tr>
+      <tr><td class="lay"><span class="lkk">P</span>Processing</td><td>Incrementality + user-intent</td><td style="font-weight:700;color:var(--accent-ink)">Feature-Impact Scoring</td><td>Pre-launch ROI · go / no-go</td></tr>
+      <tr><td class="lay"><span class="lkk">P</span>Presentation</td><td>Real-time KPI alerts</td><td style="font-weight:700;color:var(--accent-ink)">Predictive heads-up</td><td>One-step-ahead stakeholder brief</td></tr>
+      <tr><td class="lay"><span class="lkk">P</span>Presentation</td><td>Gen-AI wrapper · Analytics Hub</td><td style="font-weight:700;color:var(--accent-ink)">Gen-AI Copilots in Hub</td><td>NL KPI querying · narrative insights</td></tr>
+    </tbody>
+  </table>
+  <div class="callout en d4" style="margin-top:14px"><p>The two P's both deepen: <span class="o">Processing</span> proposes (advisory — the business decides), and <span class="o">Presentation</span> delivers it. Same pipeline, deeper engine. The two demos that follow are the first new engines.</p></div>
+  </div>
+</div></div>`);
+
+/* 7 — ALREADY ADOPTED */
 slides.push(`
 <div class="slide"><div class="pad">
   <div class="eyebrow en"><span class="bar"></span>The work already spreads across THD</div>
   <h2 class="en d1">Demand isn't hypothetical — it's already here</h2>
   <p class="lede en d2">Engines this team built are already adopted by other THD analytics teams, each running them on their own KPIs. Expansion means serving demand that already exists.</p>
   <div class="adopt stag">
-    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>Store &amp; Decision Analytics</div><div class="card-body"><div class="uses">Runs <b>ADS anomaly detection</b> on store-side KPIs with domain-specific detection parameters.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
-    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>Product · BOF · Downloads</div><div class="card-body"><div class="uses">Anomaly detection on <b>product, BOF and downloads KPIs</b> — proactive monitoring, automated alerts.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
-    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>TOFU Marketing</div><div class="card-body"><div class="uses">Detection across <b>top-of-funnel campaigns</b> — the first cross-team rollout of the monitoring engine.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
+    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>Store &amp; Decision Analytics</div><div class="card-body"><div class="uses">Runs the <b>Anomaly Detection System (ADS)</b> on store-side KPIs (Key Performance Indicators) with domain-specific detection parameters.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
+    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>Product · BOF · Downloads</div><div class="card-body"><div class="uses">ADS on <b>Product, Bottom-of-Funnel (BOF) and Downloads KPIs</b> — proactive monitoring with automated alerts.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
+    <div class="card adoptcard"><div class="card-head"><span class="dot-r"></span>TOFU Marketing</div><div class="card-body"><div class="uses">Detection across <b>Top-of-Funnel (TOFU) marketing campaigns</b> — the first cross-team rollout of the monitoring engine.</div><span class="chip accent" style="margin-top:12px">Adopted · ADS</span></div></div>
   </div>
-  <div class="callout en" style="margin-top:18px"><p>One engine, three teams. <span class="o">The factory's value compounds the moment more hands can extend it across THD.</span></p></div>
+  <div class="grid en d3" style="grid-template-columns:repeat(3,1fr);margin-top:14px">
+    <div class="stat"><div class="label">Issue resolution</div><div class="value ok mono"><span data-count="96">0</span><span class="u">%</span> faster</div><div class="ctx">Manual tracking <b>50h → 2h / week</b></div></div>
+    <div class="stat"><div class="label">Detection</div><div class="value mono">Real-time</div><div class="ctx">Forecasting framework · <b>proactive early intervention</b></div></div>
+    <div class="stat"><div class="label">Reach</div><div class="value o mono">3 teams</div><div class="ctx">One engine · <b>domain-tuned</b> per team</div></div>
+  </div>
+  <div class="callout en" style="margin-top:14px"><p>One engine, three teams, the same proven impact everywhere it lands. <span class="o">The factory's value compounds the moment more hands can extend it across THD.</span></p></div>
 </div></div>`);
 
-/* 5 — SCENARIO SIM */
+/* 8 — SCENARIO SIM */
 slides.push(`
 <div class="slide"><div class="pad">
   <div class="eyebrow en"><span class="bar"></span>Expand · Future engine</div>
@@ -328,12 +457,12 @@ slides.push(`
   </div>
 </div></div>`);
 
-/* 6 — AGENTIC */
+/* 9 — AGENTIC */
 slides.push(`
 <div class="slide"><div class="pad">
   <div class="eyebrow en"><span class="bar"></span>Expand · Future engine</div>
   <h2 class="en d1">Agentic Action Layer</h2>
-  <p class="lede en d2">Evolves from ADS detection. Scope today is online analytics: ADS detects, the agent diagnoses, predicts the trajectory, and gives online-KPI stakeholders a one-step-ahead heads-up — human-gated. With new data connections the same loop extends into action.</p>
+  <p class="lede en d2">Evolves from the Anomaly Detection System (ADS). Scope today is online analytics: ADS detects, the agent diagnoses, predicts the trajectory, and gives online-KPI (Key Performance Indicator) stakeholders a one-step-ahead heads-up — human-gated. With new data connections the same loop extends into action.</p>
   <div class="hint en d2">Pick a THD event, then Run — the final step is a predictive heads-up to stakeholders</div>
   <div class="lab en d3">
     <div class="panel">
@@ -341,7 +470,7 @@ slides.push(`
       <div class="cbody">
         <div class="field"><div class="field-label">Scenario</div><div class="seg" id="ag_scen">
           <button data-v="0" class="on">Large Appliances orders −18%</button>
-          <button data-v="1">Search CVR anomaly</button>
+          <button data-v="1">Search conversion-rate (CVR) drop</button>
           <button data-v="2">Bundle margin slips</button></div></div>
         <div class="toggle">Auto-execute safe actions<span class="sw on" id="ag_auto"></span></div>
         <button id="ag_run" class="btn">▶ Run agent</button>
@@ -361,19 +490,25 @@ slides.push(`
   </div>
 </div></div>`);
 
-/* 7 — THE ASK */
+/* 10 — THE ASK */
 slides.push(`
 <div class="slide"><div class="pad">
   <div class="eyebrow en"><span class="bar"></span>The ask — grow the Advanced Analytics team</div>
   <h2 class="en d1">A proven team, ready to build more</h2>
-  <p class="lede en d2" style="max-width:84ch">This team has shipped the factory and is evolving it now — counterfactual rigor, production discipline, measurable impact. The engines are de-risked, the demand is proven, the roadmap is set. What turns the next engines into shipped reality is simply <b>more capacity of the same caliber</b> — and agents make every builder go further.</p>
-  <div class="grid stag" style="grid-template-columns:repeat(3,1fr);margin-top:22px">
-    <div class="stat"><div class="label">Build · Past</div><div class="value ok">Proven</div><div class="ctx">Engines in production — the foundation we extend</div></div>
-    <div class="stat"><div class="label">Evolve · Present</div><div class="value o">In flight</div><div class="ctx">Hub, copilots, self-serve — building now</div></div>
-    <div class="stat"><div class="label">Expand · Future</div><div class="value o">Ready</div><div class="ctx">Simulation, agentic, new engines — awaiting capacity</div></div>
+  <p class="lede en d2" style="max-width:96ch">This team has shipped the factory and is evolving it now — counterfactual rigor, production discipline, measurable impact. The engines are de-risked, the demand is proven, the roadmap is set. What turns the next engines into shipped reality is simply <b>more capacity of the same caliber</b> — and agents make every builder go further.</p>
+  <div class="grid stag" style="grid-template-columns:repeat(3,1fr);margin-top:14px">
+    <div class="stat" style="padding:10px 13px"><div class="label">Built · Past</div><div class="value ok" style="font-size:26px">Proven</div><div class="ctx" style="margin-top:5px">Engines in production — the foundation we extend</div></div>
+    <div class="stat" style="padding:10px 13px"><div class="label">Evolve · Present</div><div class="value o" style="font-size:26px">In flight</div><div class="ctx" style="margin-top:5px">Hub, copilots, self-serve — building now</div></div>
+    <div class="stat" style="padding:10px 13px"><div class="label">Expand · Future</div><div class="value o" style="font-size:26px">Ready</div><div class="ctx" style="margin-top:5px">Simulation, agentic, new engines — awaiting capacity</div></div>
   </div>
-  <div class="callout en" style="margin-top:20px"><p>The team is strong; the limit is hours in the day. <span class="o">More builders of the same caliber means more of the factory shipped, faster — compounded by agents.</span></p></div>
-  <div class="spacer"></div>
+  <div class="microlabel en d3" style="margin-top:14px;margin-bottom:8px">What more capacity of the same caliber unlocks</div>
+  <div class="grid stag" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card"><div class="card-head"><span class="dot-r"></span>Ship the roadmap</div><div class="card-body" style="padding:11px;font-size:11px;color:var(--ink-2);line-height:1.45">De-risked future engines — Scenario Simulation, Agentic, Feature-Impact Scoring — move from <b>ready</b> to <b>shipped</b>, faster.</div></div>
+    <div class="card"><div class="card-head"><span class="dot-r"></span>Serve proven demand</div><div class="card-body" style="padding:11px;font-size:11px;color:var(--ink-2);line-height:1.45">Extend engines already pulled across THD instead of leaving demand waiting — value compounds with every team reached.</div></div>
+    <div class="card"><div class="card-head"><span class="dot-r"></span>Deepen, not just maintain</div><div class="card-body" style="padding:11px;font-size:11px;color:var(--ink-2);line-height:1.45">Today's capacity runs what's built. More builders free the team to deepen <b>Processing</b> and <b>Presentation</b>.</div></div>
+    <div class="card"><div class="card-head"><span class="dot-r"></span>Agents as a multiplier</div><div class="card-body" style="padding:11px;font-size:11px;color:var(--ink-2);line-height:1.45">Each builder supervises agentic workflows — output scales <b>super-linearly</b>, so talent compounds, not just adds.</div></div>
+  </div>
+  <div class="callout en" style="margin-top:14px"><p>The team is strong; the limit is hours in the day. <span class="o">More builders of the same caliber means more of the factory shipped, faster — compounded by agents.</span></p></div>
 </div></div>`);
 
 /* ===== ENGINE ===== */
@@ -392,7 +527,7 @@ function go(i){
   cur=Math.max(0,Math.min(S.length-1,i));
   S.forEach((s,k)=>s.classList.toggle('active',k===cur));
   dEls.forEach((d,k)=>d.classList.toggle('on',k===cur));
-  document.getElementById('counter').textContent=(cur+1)+' / '+S.length;
+  const cEl=document.getElementById('counter');if(cEl)cEl.textContent=(cur+1)+' / '+S.length;
   document.getElementById('sb-pos').textContent=pad2(cur+1)+' / '+pad2(S.length);
   document.getElementById('prev').disabled=cur===0;
   document.getElementById('next').disabled=cur===S.length-1;
@@ -478,9 +613,9 @@ function agentic(){
   document.querySelectorAll('#ag_scen button').forEach(b=>b.onclick=()=>{if(running)return;document.querySelectorAll('#ag_scen button').forEach(z=>z.classList.remove('on'));b.classList.add('on');scen=+b.dataset.v;render();});
   const feeds=['Large Appliances online orders −18% vs. forecast','Search CVR 2σ below band','Bundle margin below floor on 14 bundles'];
   const chains=[
-    [['1','Detect','ADS flags Large Appliances online orders −18% vs. forecast (p<0.01)','auto'],
-     ['2','Diagnose','Joins clickstream + on-site signals: fridge PDP add-to-cart collapsing, traffic steady','auto'],
-     ['3','Reason · predict','Forecasts −1.9% online category demand over next 10 days; pre-BF window at risk','auto'],
+    [['1','Detect','ADS flags Large Appliances online orders −18% vs. forecast (statistically significant)','auto'],
+     ['2','Diagnose','Joins clickstream + on-site signals: fridge Product Detail Page (PDP) add-to-cart collapsing, traffic steady','auto'],
+     ['3','Reason · predict','Forecasts −1.9% online category demand over next 10 days; pre-Black-Friday window at risk','auto'],
      ['4','Draft brief','Composes one-step-ahead summary: what is slipping, projected trajectory, likely drivers','auto'],
      ['5','Heads-up to online-KPI stakeholders','Predictive brief (emails, Slack, etc.) — "appliances online demand at risk into BF, projected −1.9%" — held for analyst sign-off','gate']],
     [['1','Detect','Search CVR drops on "refrigerators" query class, 2σ below band','auto'],
@@ -507,7 +642,58 @@ function agentic(){
   render();
 }
 
-const initFns={4:scenarioSim,5:agentic};
+/* I-CUPP FLOW (self-assembling, THD contents per layer) — slide 5 (index 4) */
+function flowViz(){
+  const c=document.getElementById('flow');
+  // items: [label, isFuture]. state 'b'=built, 'f'=built+expanding (both P layers expand)
+  const layers=[
+    {k:'I',nm:'Infrastructure',state:'b',items:[['BigQuery platform',0],['6TB+ data store',0],['Access & compute',0]]},
+    {k:'C',nm:'Collection',state:'b',items:[['Clickstream · behavior',0],['HHID · Visit · Segment',0],['Sales · demand · bundles',0],['OKR/BOF · AB triggers',0]]},
+    {k:'U',nm:'Unification',state:'b',items:[['Data stitching',0],['Base-table generation',0],['Segment resolution',0],['Single view (Hub)',0]]},
+    {k:'P',nm:'Processing',state:'f',items:[['PLI counterfactual',0],['Bundle · 1→7,299',0],['ADS · AB-test AIR',0],['Forecasting · exo',0],['+ Scenario Simulation',1],['+ Agentic · Scoring',1]]},
+    {k:'P',nm:'Presentation',state:'f',items:[['Analytics Hub',0],['Auto reports · dashboards',0],['Real-time KPI alerts',0],['Gen-AI conversational',0],['+ Predictive heads-up',1],['+ Hub copilots',1]]}
+  ];
+  function rr2(x,a,b,w,h,r){x.beginPath();x.roundRect(a,b,w,h,r);}
+  function clamp(v){return Math.max(0,Math.min(1,v));}
+  const OK='#2e9e4f',OKB='#e7f4e9';
+  function render(progress){
+    const r=fit(c);const x=r[0],W=r[1],H=r[2];x.clearRect(0,0,W,H);x.textBaseline='middle';
+    const n=layers.length,gap=18,pad=6;
+    const bw=(W-pad*2-gap*(n-1))/n, bx0=pad;
+    const bh=Math.min(H-30,210), by=(H-bh)/2;
+    for(let i=0;i<n-1;i++){
+      const ax=bx0+bw*(i+1)+gap*i, bxn=ax+gap, ay=by+bh/2;
+      const ap=clamp((progress-(i*0.13+0.18))/0.18); if(ap<=0)continue;
+      x.strokeStyle='rgba(249,99,2,'+(0.4*ap)+')';x.lineWidth=1.6;
+      const ex=ax+(bxn-ax)*ap;x.beginPath();x.moveTo(ax+2,ay);x.lineTo(ex-2,ay);x.stroke();
+      if(ap>=1){x.fillStyle=C_ACC;x.beginPath();x.moveTo(bxn-2,ay);x.lineTo(bxn-8,ay-4);x.lineTo(bxn-8,ay+4);x.closePath();x.fill();}
+    }
+    layers.forEach((L,i)=>{
+      const a=bx0+(bw+gap)*i, ap=clamp((progress-i*0.13)/0.22); if(ap<=0)return;
+      const e=easeOut(ap),off=(1-e)*8,isF=L.state==='f';
+      x.save();x.globalAlpha=e;
+      x.fillStyle='#fff';x.strokeStyle=isF?C_ACC:'#E5E5E5';x.lineWidth=isF?1.6:1;rr2(x,a,by+off,bw,bh,8);x.fill();x.stroke();
+      x.fillStyle=isF?'#FFF3EA':'#FAFAFA';rr2(x,a,by+off,bw,38,8);x.fill();
+      x.fillStyle='#fff';x.fillRect(a,by+30+off,bw,8);
+      x.fillStyle=C_ACC;rr2(x,a+11,by+10+off,22,22,5);x.fill();
+      x.fillStyle='#fff';x.font='800 13px Manrope';x.textAlign='center';x.fillText(L.k,a+22,by+22+off);
+      x.fillStyle=isF?C_ACC2:'#111';x.font='700 12px Manrope';x.textAlign='left';x.fillText(L.nm,a+40,by+22+off);
+      // items — row pitch adapts to count so up to 6 fit above the footer
+      const top=by+58+off, botLimit=by+bh-34, rows=L.items.length;
+      const pitch=Math.min(28,(botLimit-top)/rows);
+      L.items.forEach((it,j)=>{const iy=top+j*pitch+pitch/2;const fut=it[1]===1;
+        x.fillStyle=fut?C_ACC:OK;x.beginPath();x.arc(a+15,iy,3.5,0,7);x.fill();
+        x.fillStyle=fut?C_ACC2:'#3F3F3F';x.font=(fut?'700 ':'600 ')+'11px Manrope';x.fillText(it[0],a+25,iy);});
+      const cy=by+bh-21;
+      x.fillStyle=isF?'#FFF3EA':OKB;rr2(x,a+11,cy-9,isF?86:54,18,4);x.fill();
+      x.fillStyle=isF?C_ACC2:OK;x.font='700 9px Manrope';x.textAlign='left';x.fillText(isF?'+ EXPANDING':'BUILT',a+18,cy);
+      x.restore();
+    });
+  }
+  if(REDUCE){render(1);}else{const t0=performance.now();(function fr(now){const p=Math.min(1,(now-t0)/2000);render(p);if(p<1)requestAnimationFrame(fr);})(performance.now());}
+}
+
+const initFns={7:scenarioSim,8:agentic};
 window.addEventListener('resize',()=>{if(initFns[cur])requestAnimationFrame(initFns[cur]);});
 go(0);
 </script>
