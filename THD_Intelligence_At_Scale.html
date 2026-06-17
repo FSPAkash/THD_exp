@@ -124,13 +124,12 @@ h2{font-size:clamp(19px,1.1vw+1.2vh,30px);font-weight:700;letter-spacing:-.02em;
 .callout{padding:clamp(9px,1.6vh,13px) 15px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--bg-stripe)}
 .callout p{font-size:clamp(11.5px,1.5vh,13px);font-weight:500;color:var(--ink);line-height:1.45}
 .callout .o{color:var(--accent-ink);font-weight:700}
-.askbar{display:flex;align-items:center;gap:16px;padding:clamp(10px,1.7vh,15px) 18px;border:1px solid var(--accent);border-radius:var(--r-card);background:var(--accent-tint)}
-.askbar .asknum{display:flex;flex-direction:column;align-items:center;line-height:1;padding-right:16px;border-right:1px solid var(--accent)}
-.askbar .asknum b{font-family:var(--font-mono,monospace);font-size:clamp(28px,4.4vh,40px);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-.askbar .asknum span{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);margin-top:4px}
-.askbar .askk{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:4px}
-.askbar .askv{font-size:clamp(11.5px,1.5vh,13px);font-weight:500;color:var(--ink);line-height:1.45}
-.askbar .askv b{color:var(--accent-ink);font-weight:700}
+.askbar{display:flex;align-items:center;gap:clamp(14px,1.6vw,20px);padding:clamp(12px,1.9vh,17px) clamp(16px,1.6vw,22px);border:1px solid var(--line);border-radius:var(--r-card);background:var(--bg-stripe)}
+.askbar .asklbl{flex:none;display:flex;align-items:center;gap:8px;font-size:clamp(11px,1.4vh,13px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink)}
+.askbar .asklbl::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent)}
+.askbar .asksep{flex:none;width:1px;align-self:stretch;background:var(--line-2)}
+.askbar .asktxt{font-size:clamp(11.5px,1.5vh,13.5px);font-weight:500;color:var(--ink-2);line-height:1.5}
+.askbar .asktxt b{color:var(--accent-ink);font-weight:700}
 
 /* lab interactive */
 .lab{display:grid;grid-template-columns:clamp(270px,24vw,330px) 1fr;gap:14px;flex:1;min-height:0;margin-top:clamp(6px,1.3vh,10px)}
@@ -617,8 +616,11 @@ slides.push(`
       </div>
     </div>
   </div>
-  <div class="askbar en" style="margin-top:14px"><div class="asknum"><b>4</b><span>FTE</span></div><div class="asktxt"><div class="askk">The ask</div><div class="askv">A <b>4 FTE expansion over the next 12 months</b> to deepen Processing and Presentation of intelligence applications, the two P's where the agentic layer is built.</div></div></div>
-  <div class="callout en" style="margin-top:12px"><p>Four builders of the same caliber is a one-time cost. <span class="o">The agentic layer they ship is a permanent multiplier, monitoring hundreds of KPIs and simulating thousands of scenarios no team could ever cover by hand.</span></p></div>
+  <div class="askbar en" style="margin-top:16px">
+    <div class="asklbl">The ask</div>
+    <div class="asksep"></div>
+    <div class="asktxt">A <b>4 FTE expansion</b> to deepen Processing and Presentation of intelligence applications. These builders ship the agentic layer, which then monitors hundreds of KPIs and simulates thousands of scenarios no team could ever cover by hand.</div>
+  </div>
 </div></div>`);
 
 /* ===== ENGINE ===== */
