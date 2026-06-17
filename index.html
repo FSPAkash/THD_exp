@@ -124,6 +124,13 @@ h2{font-size:clamp(19px,1.1vw+1.2vh,30px);font-weight:700;letter-spacing:-.02em;
 .callout{padding:clamp(9px,1.6vh,13px) 15px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--bg-stripe)}
 .callout p{font-size:clamp(11.5px,1.5vh,13px);font-weight:500;color:var(--ink);line-height:1.45}
 .callout .o{color:var(--accent-ink);font-weight:700}
+.askbar{display:flex;align-items:center;gap:16px;padding:clamp(10px,1.7vh,15px) 18px;border:1px solid var(--accent);border-radius:var(--r-card);background:var(--accent-tint)}
+.askbar .asknum{display:flex;flex-direction:column;align-items:center;line-height:1;padding-right:16px;border-right:1px solid var(--accent)}
+.askbar .asknum b{font-family:var(--font-mono,monospace);font-size:clamp(28px,4.4vh,40px);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.askbar .asknum span{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);margin-top:4px}
+.askbar .askk{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:4px}
+.askbar .askv{font-size:clamp(11.5px,1.5vh,13px);font-weight:500;color:var(--ink);line-height:1.45}
+.askbar .askv b{color:var(--accent-ink);font-weight:700}
 
 /* lab interactive */
 .lab{display:grid;grid-template-columns:clamp(270px,24vw,330px) 1fr;gap:14px;flex:1;min-height:0;margin-top:clamp(6px,1.3vh,10px)}
@@ -382,7 +389,7 @@ slides.push(`
 <div class="slide"><div class="pad">
   <div class="eyebrow en"><span class="bar"></span>The operating model behind the factory - I-CUPP</div>
   <h2 class="en d1">A factory needs a production line. Ours is I-CUPP.</h2>
-  <p class="lede en d2">Every engine runs the same five-layer line, read in flow: the owner provides the ground (I); we pull raw material (C); connect it into one picture (U); apply the engine to decide (P · Processing); package it so people act and own it (P · Presentation). This is why expansion is low-risk - the line already exists; we add stations to it.</p>
+  <p class="lede en d2">Every engine runs the same five layers end to end: THD provides the infrastructure (I), we collect the raw data (C) and unify it into one picture (U), then the engine processes that into a decision (P) and presents it so people act (P). The line already exists, which is what makes the expansion low-risk: it adds capacity to the last two layers, not a new pipeline.</p>
   <div style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:6px">
   <table class="tbl en d3">
     <thead><tr><th style="width:170px">Layer</th><th>The question it answers</th><th>What belongs here</th></tr></thead>
@@ -403,37 +410,37 @@ slides.push(`
 <div class="slide"><div class="pad">
   <div class="eyebrow en"><span class="bar"></span>The proof - the factory already runs every layer</div>
   <h2 class="en d1">THD isn't starting an AI pipeline - it already runs a full one</h2>
-  <p class="lede en d2">The proven engines map cleanly onto all five layers, live on Home Depot's own data. <b style="color:var(--ok)">Green = built &amp; in production.</b> <b style="color:var(--accent-ink)">Orange = where the expansion deepens the two P's</b> - no new foundation required.</p>
+  <p class="lede en d2">The proven engines map cleanly onto all five layers, live on Home Depot's own data. <b style="color:var(--ok)">Green = built &amp; in production.</b> <b style="color:var(--accent-ink)">Orange = where the expansion deepens the two P's.</b></p>
   <div class="icupp stag">
     <div class="icol">
       <div class="ihd"><span class="lk">I</span><span class="nm">Infrastructure</span></div>
       <div class="ibody"><div class="iitem">BigQuery, 6TB+ store</div><div class="iitem">Clickstream</div><div class="iitem">Raw hits</div><div class="iitem">NURO data pipes</div><div class="iitem">Adobe Analytics</div><div class="iitem">Adobe CJA</div><div class="iitem">Access &amp; compute</div></div>
-      <div class="ifoot"><span class="istat">Built</span></div>
+      <div class="ifoot"><span class="istat">Built &amp; Maintaining in Production</span></div>
     </div>
     <div class="icol">
       <div class="ihd"><span class="lk">C</span><span class="nm">Collection</span></div>
       <div class="ibody"><div class="iitem">Clickstream behavior</div><div class="iitem">HHID, Visit, Segment</div><div class="iitem">Sales &amp; demand</div><div class="iitem">Product bundles</div><div class="iitem">OKR / BOF KPIs</div><div class="iitem">AB / Workfront triggers</div></div>
-      <div class="ifoot"><span class="istat">Built</span></div>
+      <div class="ifoot"><span class="istat">Built &amp; Maintaining in Production</span></div>
     </div>
     <div class="icol">
       <div class="ihd"><span class="lk">U</span><span class="nm">Unification</span></div>
       <div class="ibody"><div class="iitem">Data stitching</div><div class="iitem">Base-table generation</div><div class="iitem">Segment resolution</div><div class="iitem">Component cross-validation</div><div class="iitem">Single unified view</div></div>
-      <div class="ifoot"><span class="istat">Built</span></div>
+      <div class="ifoot"><span class="istat">Built &amp; Maintaining in Production</span></div>
     </div>
     <div class="icol exp">
       <div class="ihd"><span class="lk">P</span><span class="nm">Processing</span></div>
       <div class="ibody"><div class="iitem">PLI (Post-Launch Incrementality)</div><div class="iitem">Bundle incrementality</div><div class="iitem">ADS (Anomaly Detection System)</div><div class="iitem">AB-test AIR</div><div class="iitem">Forecasting, exo variables</div><div class="iitem f">+ Scenario Simulation</div><div class="iitem f">+ Agentic Action Layer</div><div class="iitem f">+ Feature-Impact Scoring</div></div>
-      <div class="ifoot"><span class="istat exp">Built + Expanding</span></div>
+      <div class="ifoot"><span class="istat exp">Expansion</span></div>
     </div>
     <div class="icol exp">
       <div class="ihd"><span class="lk">P</span><span class="nm">Presentation</span></div>
       <div class="ibody"><div class="iitem">Analytics Hub</div><div class="iitem">Auto reports</div><div class="iitem">Tableau dashboards</div><div class="iitem">Real-time alerts</div><div class="iitem">Gen-AI conversational</div><div class="iitem f">+ Predictive heads-up</div><div class="iitem f">+ Hub copilots</div></div>
-      <div class="ifoot"><span class="istat exp">Built + Expanding</span></div>
+      <div class="ifoot"><span class="istat exp">Expansion</span></div>
     </div>
   </div>
   <div class="legend">
-    <b><span class="sq b"></span> Built &amp; in production</b>
-    <b><span class="sq f"></span> Expanding - both P's (Processing &amp; Presentation)</b>
+    <b><span class="sq b"></span> Built &amp; maintaining in production</b>
+    <b><span class="sq f"></span> Expansion - both P's (Processing &amp; Presentation)</b>
     <span style="margin-left:auto;color:var(--ink-3)">Infrastructure posture - <b style="color:var(--ink-2)">Provided</b> (THD-owned, used as-is)</span>
   </div>
 </div></div>`);
@@ -582,7 +589,7 @@ slides.push(`
 <div class="slide"><div class="pad">
   <div class="eyebrow en"><span class="bar"></span>The ask - grow the Advanced Analytics team</div>
   <h2 class="en d1">The factory is running. Grow the team to make it agentic.</h2>
-  <p class="lede en d2" style="max-width:100ch">The factory runs today on predictive models and automation. The agentic layer is the next step, and it does not arrive on its own: <b>added hands build it once, and then it multiplies the team's reach</b>. A handful of new builders ship the engines, and the engines do what no team could ever do by hand.</p>
+  <p class="lede en d2" style="max-width:100ch">The factory runs today on predictive models and automation. The agentic layer is the next step, and it does not arrive on its own: <b>added hands build it once, and then it multiplies the team's reach</b>. A few new builders ship the engines, and the engines do what no team could ever do by hand.</p>
   <div class="microlabel en d3" style="margin-top:16px;margin-bottom:8px">Added hands build the agentic layer, then the layer scales the analytics</div>
   <div class="phase stag" style="margin:0">
     <div class="phasecol">
@@ -610,7 +617,8 @@ slides.push(`
       </div>
     </div>
   </div>
-  <div class="callout en" style="margin-top:14px"><p>A few more builders of the same caliber is a one-time cost. <span class="o">The agentic layer they ship is a permanent multiplier, monitoring hundreds of KPIs and simulating thousands of scenarios no team could ever cover by hand.</span></p></div>
+  <div class="askbar en" style="margin-top:14px"><div class="asknum"><b>4</b><span>FTE</span></div><div class="asktxt"><div class="askk">The ask</div><div class="askv">A <b>4 FTE expansion over the next 12 months</b> to deepen Processing and Presentation of intelligence applications, the two P's where the agentic layer is built.</div></div></div>
+  <div class="callout en" style="margin-top:12px"><p>Four builders of the same caliber is a one-time cost. <span class="o">The agentic layer they ship is a permanent multiplier, monitoring hundreds of KPIs and simulating thousands of scenarios no team could ever cover by hand.</span></p></div>
 </div></div>`);
 
 /* ===== ENGINE ===== */
